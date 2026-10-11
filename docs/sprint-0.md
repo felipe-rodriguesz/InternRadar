@@ -9,7 +9,7 @@
 - Milestone: [Sprint 0 — Project Foundation](https://github.com/felipe-rodriguesz/InternRadar/milestone/1).
 - S0-01 integrada por rebase no [PR #2](https://github.com/felipe-rodriguesz/InternRadar/pull/2), em `acaff60f8bb4aacc703fad89886b033807b0588c`; Issue #1 fechada.
 - Lote autorizado S0-02/S0-03: branch `chore/s0-02-03-docs-postgresql`, derivada dessa main após `git pull --ff-only`. Issues [#3](https://github.com/felipe-rodriguesz/InternRadar/issues/3) e [#4](https://github.com/felipe-rodriguesz/InternRadar/issues/4), no mesmo Milestone.
-- Estado do lote: S0-02 finalizada; infraestrutura S0-03 implementada, com homologação bloqueada por entrypoint vazio no PostgreSQL local. Publicação autorizada em Draft PR para revisão; merge não autorizado.
+- Estado do lote: S0-02 finalizada e S0-03 homologada após recuperação da imagem PostgreSQL. Entrega no [PR #5](https://github.com/felipe-rodriguesz/InternRadar/pull/5), aguardando revisão; merge não autorizado. Os registros das falhas anteriores abaixo são históricos.
 
 ## Distribuição das validações aprovada
 
@@ -303,22 +303,22 @@ Referências: HU-12; RNF-001/002/003/006/016/019; seções 13–15. S0-02 docume
 - [x] README e operação do banco documentados com comandos reais.
 - [x] Decisões complementares em `requirements-proposed-changes.md`; v1.0 intacta.
 
-ADRs contêm contexto, decisão, justificativa, consequências e alternativas. ADR-004/005 permanecem reservados aos contratos dos conectores e à política de datas/status da especificação. Documentação distingue infraestrutura preparada e verificações ainda bloqueadas. Fontes reais de seed, licença e hospedagem permanecem decisões futuras.
+ADRs contêm contexto, decisão, justificativa, consequências e alternativas. ADR-004/005 permanecem reservados aos contratos dos conectores e à política de datas/status da especificação. Documentação distingue infraestrutura homologada e validações futuras de aplicações. Fontes reais de seed, licença e hospedagem permanecem decisões futuras.
 
 ## S0-03 — PostgreSQL local e testes isolados
 
-Referências: RF-001; HU-01/HU-12; RNF-001/006/016. Implementação preparada; **entrega ainda não homologada**. O Engine passou no teste simples após recuperação, mas PostgreSQL falhou antes de executar SQL; evidências atuais constam na seção de recuperação abaixo.
+Referências: RF-001; HU-01/HU-12; RNF-001/006/016. **Entrega homologada em 11/10/2026**: configuração, saúde, conectividade, autenticação, persistência e isolamento aprovados. [Diagnóstico e evidências da recuperação](postgresql-recovery.md).
 
-- `compose.yaml`: PostgreSQL `17.11-bookworm`, fixado pelo digest OCI `sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826`.
+- `compose.yaml`: PostgreSQL `17.11-trixie`, fixado pelo digest OCI `sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3`; substituição da variante Bookworm documentada no ADR-002.
 - Serviços `postgres` e `postgres-test` (profile `test`), com redes e volumes próprios.
 - Portas configuráveis publicadas somente em `127.0.0.1`, padrões 5432/5433.
 - Variáveis obrigatórias, SCRAM para TCP, healthcheck `pg_isready` e logs com rotação (10 MB × 3).
 - `.env.example` com placeholders; `.env` local ignorado e privado, sem credenciais incluídas na entrega.
 - Scripts `db:config`, `db:up`, `db:stop`, `db:status`, `db:logs`, `db:test:up`, `db:test:stop`, `db:test:logs` e `db:verify`.
 - Verificador Node sem dependências adicionais: cria projeto único, portas disponíveis, credenciais aleatórias, testa configuração, saúde, TCP/SQL/autenticação, persistência e isolamento. Para somente seus containers e preserva volumes; não utiliza o projeto diário.
-- Nenhum schema Prisma, migração ou seed do produto. A tabela SQL de prova será criada somente nos bancos novos do verificador.
+- Nenhum schema Prisma, migração ou seed do produto. A tabela SQL de prova foi criada somente nos bancos novos do verificador.
 
-### Evidências da retomada em 11/10/2026
+### Histórico: primeira retomada em 11/10/2026
 
 | Comando/verificação                                       | Resultado observado                                                                                                                                          |
 | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -336,20 +336,20 @@ Referências: RF-001; HU-01/HU-12; RNF-001/006/016. Implementação preparada; *
 
 A falha ocorreu após criar as redes e os volumes `internradar-check-0c06fac7328e_postgres_data` e `internradar-check-0c06fac7328e_postgres_test_data`. Todos permanecem preservados; nenhum comando de remoção de volumes foi executado. Não foi possível concluir a inspeção do daemon após a falha nem confirmar containers eventualmente criados. Os testes não se conectaram ao banco e não executaram a tabela de prova. A falha ao parar o projeto também retorna status de erro; não é ocultada pelo script.
 
-### Pendências específicas
+### Acompanhamento das validações
 
-| ID        | Resultado necessário                                                                                 | Estado                                 |
-| --------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| S0-03-V01 | Inicializar dois serviços e confirmar saúde, TCP no host e SQL autenticado                           | Bloqueado: entrypoint PostgreSQL vazio |
-| S0-03-V02 | Confirmar dados após restart/recriação de containers próprios e isolamento de clusters/redes/volumes | Não executado; depende de V01          |
-| S0-03-V03 | Rejeitar senha SQL incorreta e inspecionar estado final do projeto de teste                          | Não executado; depende de V01          |
-| S0-03-P01 | Publicar o progresso em Draft PR com limitações e preservar main/volumes                             | Autorizado; publicação neste lote      |
+| ID        | Resultado necessário                                                                                 | Estado                                     |
+| --------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| S0-03-V01 | Inicializar dois serviços e confirmar saúde, TCP no host e SQL autenticado                           | Concluído em 11/10/2026                    |
+| S0-03-V02 | Confirmar dados após restart/recriação de containers próprios e isolamento de clusters/redes/volumes | Concluído em 11/10/2026                    |
+| S0-03-V03 | Rejeitar senha SQL incorreta e inspecionar estado final do projeto de teste                          | Concluído em 11/10/2026                    |
+| S0-03-P01 | Publicar o progresso em Draft PR com limitações e preservar main/volumes                             | Concluído no PR #5; homologação atualizada |
 
 S0-04: aplicativos, ambiente privado carregado explicitamente, saúde/comunicação e typecheck/build. S0-05: Prisma major 7, geração/build/runtime, entidades, migrações e seed idempotente no banco separado de testes. S0-06: CI dos comandos reais. Nenhuma dessas validações foi declarada executada neste lote.
 
-Revisão estática final da retomada: `pnpm format:check`, `pnpm lint`, `node --check scripts/verify-database.mjs` e `git diff --check` aprovados; whitespace dos arquivos não rastreados também validado. API TypeScript confirmou herança strict dos três tsconfigs, sem fontes ou typecheck de aplicativos. Foram revisados 34 arquivos versionáveis; nenhuma senha do ambiente local ou padrão de token/chave privada foi encontrado. O `.env` permanece ignorado, com modo 0600. Nenhum commit, push ou PR do lote foi realizado enquanto a homologação do PostgreSQL está bloqueada.
+Revisão estática da primeira retomada: `pnpm format:check`, `pnpm lint`, `node --check scripts/verify-database.mjs` e `git diff --check` aprovados; whitespace dos arquivos não rastreados também validado. API TypeScript confirmou herança strict dos três tsconfigs, sem fontes ou typecheck de aplicativos. Foram revisados 34 arquivos versionáveis; nenhuma senha do ambiente local ou padrão de token/chave privada foi encontrado. O `.env` permanece ignorado, com modo 0600. Naquele momento, ainda não havia commit, push ou PR do lote.
 
-### Nova tentativa após liberação de espaço no C: — 11/10/2026, 04:58 UTC
+### Histórico: tentativa após liberação de espaço no C: — 11/10/2026, 04:58 UTC
 
 A tentativa inicial falhou antes de acessar o Engine: `timeout: failed to run command ‘docker’: Input/output error` (status 126). `/usr/bin/docker` aponta para `/mnt/wsl/docker-desktop/cli-tools/usr/bin/docker`; o socket existe, mas não foi testado novamente após identificar I/O, conforme orientação do responsável. O kernel registrou novos erros de leitura em `loop0`.
 
@@ -357,7 +357,7 @@ A tentativa inicial falhou antes de acessar o Engine: `timeout: failed to run co
 
 Branch e alterações anteriores preservadas; main/HEAD/origin/main em `acaff60`. SHA-256 da especificação e do lockfile preservados; `git diff --check` aprovado. Commits, push e PR continuam pendentes da homologação real.
 
-### Recuperação do Engine e homologação controlada — 11/10/2026
+### Histórico: recuperação do Engine e falha da imagem — 11/10/2026
 
 Os clientes Windows e Ubuntu retornaram o mesmo ID `6400e8db-a5da-49fc-8e50-02d142a8749f`, Engine 29.8.2 e Docker Desktop; Compose 5.5.1. `df` registrou cerca de 17 GiB livres no C: (a diferença para GB decimais explica aproximadamente 18,68 GB informados pelo responsável). O backup do VHDX foi informado pelo responsável; sua cópia não foi criada nem revalidada pelo agente.
 
@@ -381,4 +381,20 @@ O entrypoint vazio é evidência de inconsistência no conteúdo local da imagem
 
 O verificador parou os containers próprios `internradar-check-e3dcaedf6932-postgres-1` e `internradar-check-e3dcaedf6932-postgres-test-1`. Volumes `internradar-check-e3dcaedf6932_postgres_data` e `internradar-check-e3dcaedf6932_postgres_test_data`, redes e containers permanecem preservados. Nenhum volume anterior foi utilizado, apagado ou reinicializado.
 
-Conforme autorização do responsável, o progresso tem publicação autorizada em **Draft Pull Request**, com as Issues #3/#4 abertas. S0-02 está documentada; S0-03 continua pendente das verificações V01/V02/V03. Restaurar uma imagem PostgreSQL executável sem perder os dados preservados exige intervenção no ambiente; após isso, repetir `pnpm db:verify`, atualizar evidências e tornar o PR pronto para revisão. Merge segue condicionado a autorização específica.
+Esse progresso foi publicado no **Draft PR #5**, commits `701d129` (infraestrutura) e `f031687` (documentação), com as Issues #3/#4 abertas. Naquele momento, S0-03 permanecia pendente das verificações V01/V02/V03. A recuperação seguinte resolveu o bloqueio sem remover recursos.
+
+### Recuperação da imagem e homologação concluída — 11/10/2026
+
+O diagnóstico comparou containers antigos, um novo sem volumes existentes e o conteúdo do registry oficial. O entrypoint local estava vazio também no novo container, sem alterações na camada gravável; PostgreSQL ainda encontrou `libzstd.so.1: file too short`. No registry, o script do mesmo digest tinha 14.577 bytes. Há inconsistência no conteúdo local compartilhado, sem comprovar se está no blob comprimido ou no snapshot descompactado.
+
+A variante oficial Debian Trixie preserva PostgreSQL 17.11 e o caminho de dados, com camadas independentes da imagem Bookworm local. Entrypoint, sete arquivos essenciais e binários foram verificados antes do Compose. O ADR-002 registra a decisão e a necessidade de análise de collation/backup para clusters antigos; a homologação usou exclusivamente volumes novos.
+
+- `pnpm db:config` e `pnpm db:verify`: status 0, todos os critérios V01/V02/V03 aprovados no projeto `internradar-check-74f4d78f5fa0`.
+- Proteção adicional no verificador: conferir os nomes e montagens resolvidos antes de criar containers. Teste negativo com volume externo existente recusado; inventário inalterado.
+- Dois healthchecks, protocolo no host, SQL autenticado, senha incorreta rejeitada, marcadores isolados e persistência após restart/recriação comprovados.
+- Inventário inicial preservado; containers próprios encerrados com exit 0 e volumes mantidos. Engine estável, sem novos erros de I/O/SIGBUS/filesystem no intervalo observado.
+- Especificação original, TypeScript strict, dependências e lockfile preservados. Sem teste de aplicações/Prisma/CI antecipado.
+
+Revisão final da recuperação: `pnpm install --frozen-lockfile --strict-peer-dependencies`, `pnpm lint`, `pnpm format:check`, `pnpm workspace:list`, `pnpm list --depth 0`, `node --check scripts/verify-database.mjs` e `git diff main --check` aprovados. Os 35 arquivos versionáveis passaram na revisão de credenciais locais/padrões de segredo, YAML/JSON, links, ADRs e LF. O parser YAML considera os múltiplos documentos do lockfile pnpm. API TypeScript confirmou strict nos três tsconfigs; `.env` segue ignorado, modo 0600. SHA-256 da especificação: `917610528b367257bc1fe2da1a02ac1527e30e6cd2f52052e45cd95e7414e65e`, com igualdade de bytes ao original.
+
+Inventário, digests, verificações de integridade e limites constam em [postgresql-recovery.md](postgresql-recovery.md). Issues #3/#4 permanecem abertas até integração autorizada do PR #5. Nenhum merge, tag, release ou limpeza de recursos faz parte desta recuperação.

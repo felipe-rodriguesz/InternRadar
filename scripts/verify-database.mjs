@@ -116,6 +116,28 @@ try {
     '',
   );
   compose('--profile', 'test', 'config', '--quiet');
+  // Conferir o modelo resolvido antes de criar containers: nenhum volume existente.
+  const config = JSON.parse(compose('--profile', 'test', 'config', '--format', 'json'));
+  const existingVolumes = docker(['volume', 'ls', '--format', '{{.Name}}']).split('\n');
+  const services = { postgres: 'postgres_data', 'postgres-test': 'postgres_test_data' };
+  assert.deepEqual(Object.keys(config.volumes).sort(), Object.values(services).sort());
+  for (const [service, source] of Object.entries(services)) {
+    const volume = config.volumes[source];
+    assert(!volume.external, 'O verificador não aceita volumes externos.');
+    assert.equal(volume.name, `${project}_${source}`, 'Volume fora do projeto próprio.');
+    assert(
+      !existingVolumes.includes(volume.name),
+      'O verificador não reutiliza volumes existentes.',
+    );
+    const mounts = config.services[service].volumes;
+    assert.equal(mounts.length, 1, 'O verificador aceita somente o volume de dados próprio.');
+    assert.equal(mounts[0].type, 'volume');
+    assert.equal(mounts[0].source, source);
+    assert.equal(mounts[0].target, '/var/lib/postgresql/data');
+  }
+  console.log(
+    'PASS: volumes resolvidos pertencem ao projeto novo; nenhum volume existente montado.',
+  );
   for (const [variable, value, message] of [
     ['POSTGRES_PASSWORD', '', 'POSTGRES_PASSWORD'],
     ['POSTGRES_PORT', 'invalid-port', 'port'],

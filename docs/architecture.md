@@ -11,14 +11,14 @@ flowchart LR
   Tests[Testes de persistência — S0-05] --> TestDB[(PostgreSQL testes: profile test)]
 ```
 
-| Camada     | Responsabilidade                                        | Estado                                   |
-| ---------- | ------------------------------------------------------- | ---------------------------------------- |
-| Raiz       | Workspace, qualidade, infraestrutura e políticas comuns | Implementada                             |
-| Web        | Interface e cliente da API InternRadar                  | Manifest; inicialização na S0-04         |
-| API        | Configuração, saúde, domínio, conectores e persistência | Manifest; inicialização na S0-04         |
-| PostgreSQL | Dois clusters locais com armazenamento separado         | Configurado; homologação S0-03 bloqueada |
-| Prisma     | Entidades, migrações e seed idempotente                 | S0-05                                    |
-| CI         | Checks reais em PRs                                     | S0-06                                    |
+| Camada     | Responsabilidade                                        | Estado                           |
+| ---------- | ------------------------------------------------------- | -------------------------------- |
+| Raiz       | Workspace, qualidade, infraestrutura e políticas comuns | Implementada                     |
+| Web        | Interface e cliente da API InternRadar                  | Manifest; inicialização na S0-04 |
+| API        | Configuração, saúde, domínio, conectores e persistência | Manifest; inicialização na S0-04 |
+| PostgreSQL | Dois clusters locais com armazenamento separado         | Homologado na S0-03              |
+| Prisma     | Entidades, migrações e seed idempotente                 | S0-05                            |
+| CI         | Checks reais em PRs                                     | S0-06                            |
 
 O backend terá fronteiras entre integração externa, normalização, serviços de domínio e persistência. Continuará um único aplicativo; adicionar uma plataforma não deve alterar a listagem pública de vagas. Não há código dessas camadas antecipado neste lote.
 
