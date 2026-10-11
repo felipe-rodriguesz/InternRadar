@@ -31,7 +31,8 @@
     "db:seed": "pnpm --filter @internradar/api db:seed",
     "test:integration": "pnpm --filter @internradar/api test:integration",
     "greenhouse:check": "pnpm --filter @internradar/api greenhouse:check",
-    "test:unit": "pnpm --filter @internradar/api test:unit"
+    "test:unit": "pnpm --filter @internradar/api test:unit",
+    "sync:jobs": "pnpm --filter @internradar/api sync:jobs"
   },
   "devDependencies": {
     "@eslint/compat": "2.1.1",
