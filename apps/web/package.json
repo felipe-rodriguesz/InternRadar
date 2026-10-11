@@ -9,7 +9,7 @@
     "start": "next start --hostname 127.0.0.1",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "playwright test"
+    "test": "pnpm --filter @internradar/api test:browser"
   },
   "dependencies": {
     "next": "16.4.0",

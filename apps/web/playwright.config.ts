@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
+if (process.env.INTERNRADAR_BROWSER_ISOLATED !== '1') {
+  throw new Error('Execute pnpm --filter @internradar/web test para preparar o banco isolado.');
+}
+
 export default defineConfig({
   testDir: './test',
   fullyParallel: false,

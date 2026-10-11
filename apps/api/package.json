@@ -20,7 +20,8 @@
     "test:unit": "node --import tsx --test test/environment.test.ts test/normalization.test.ts test/greenhouse.test.ts test/jobs-query.test.ts",
     "test:http": "node --import tsx --test test/health.test.ts",
     "greenhouse:check": "tsx src/connectors/greenhouse/check-greenhouse.ts",
-    "sync:jobs": "tsx src/sync/sync.cli.ts"
+    "sync:jobs": "tsx src/sync/sync.cli.ts",
+    "test:browser": "tsx test/browser-runner.ts"
   },
   "dependencies": {
     "@nestjs/common": "12.1.2",

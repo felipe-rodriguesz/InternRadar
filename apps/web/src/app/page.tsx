@@ -39,9 +39,11 @@ export default function Home() {
             <div className="foundation-note">
               <span className="note-number">01 /</span>
               <p>
-                Estamos preparando a base.
+                Explore as fontes monitoradas.
                 <br />
-                <strong>A descoberta de vagas vem a seguir.</strong>
+                <Link className="text-link" href="/jobs">
+                  Buscar oportunidades →
+                </Link>
               </p>
             </div>
           </section>
