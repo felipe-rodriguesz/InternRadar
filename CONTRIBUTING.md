@@ -41,7 +41,8 @@ Exemplos: `docs(adr): record local environment decisions`, `chore(db): configure
 - `docs/requirements.md` e `pnpm-lock.yaml` ficam fora do Prettier. Nunca altere manualmente o lockfile para esconder inconsistências.
 - Dependências diretas têm versões exatas e pertencem ao pacote que as usa; ferramentas comuns ficam na raiz.
 - Testes de conectores usarão fixtures identificadas; integração de dados usará PostgreSQL separado. Os testes atuais verificam saúde HTTP, interface e persistência real em schema novo no cluster separado.
-- Typecheck, builds, migrações e seed são executáveis. CI será introduzida na S0-06 com os comandos reais correspondentes. Schemas de teste são preservados; não limpar automaticamente dados/volumes.
+- Typecheck, builds, migrações e seed são executáveis. [CI](docs/ci.md) provisiona bancos/browsers efêmeros no GitHub; valide o resultado remoto antes de declarar aceite. Schemas de testes locais são preservados; não limpar automaticamente dados/volumes.
+- `pnpm test:unit` testa contratos/conector offline. `pnpm greenhouse:check figma` é uma consulta externa pontual sem escrita no banco; não substitui fixtures nem integra o CI.
 
 ## Revisão
 
