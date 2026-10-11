@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { fetchHealth } from '../lib/health';
+import { DatabaseUnavailableError, fetchHealth } from '../lib/health';
 import type { Health } from '../lib/health';
 
 type State =
   | { status: 'loading' }
-  | { status: 'error' }
+  | { status: 'error'; reason: 'network' | 'database' }
   | { status: 'success'; health: Health; checkedAt: Date };
 
 export function ConnectionStatus() {
@@ -19,8 +19,12 @@ export function ConnectionStatus() {
         if (!controller.signal.aborted)
           setState({ status: 'success', health, checkedAt: new Date() });
       },
-      () => {
-        if (!controller.signal.aborted) setState({ status: 'error' });
+      (error: unknown) => {
+        if (!controller.signal.aborted)
+          setState({
+            status: 'error',
+            reason: error instanceof DatabaseUnavailableError ? 'database' : 'network',
+          });
       },
     );
   }
@@ -47,7 +51,11 @@ export function ConnectionStatus() {
       ? 'Verificando conexão…'
       : state.status === 'success'
         ? 'Conexão estabelecida'
-        : 'Não foi possível conectar';
+        : state.reason === 'database'
+          ? 'Banco de dados indisponível'
+          : 'Não foi possível conectar';
+
+  const databaseError = state.status === 'error' && state.reason === 'database';
 
   return (
     <section className="connection-panel" aria-labelledby="connection-title">
@@ -72,13 +80,15 @@ export function ConnectionStatus() {
             ? 'Consultando a API do InternRadar.'
             : state.status === 'success'
               ? 'O InternRadar está respondendo. A base para suas próximas descobertas está pronta.'
-              : 'Não recebemos uma resposta válida. Confira se a API está em execução e tente novamente.'}
+              : databaseError
+                ? 'A API respondeu, mas não conseguiu consultar o PostgreSQL. Confira o banco local e tente novamente.'
+                : 'Não recebemos uma resposta válida. Confira se a API está em execução e tente novamente.'}
         </p>
         <dl className="service-list">
           <div>
             <dt>API InternRadar</dt>
             <dd>
-              {state.status === 'success'
+              {state.status === 'success' || databaseError
                 ? 'Disponível'
                 : state.status === 'loading'
                   ? 'Verificando'
@@ -90,7 +100,9 @@ export function ConnectionStatus() {
             <dd>
               {state.status === 'success' && state.health.database.status === 'connected'
                 ? 'Conexão verificada'
-                : 'Não confirmado'}
+                : databaseError
+                  ? 'Indisponível'
+                  : 'Não confirmado'}
             </dd>
           </div>
         </dl>

@@ -18,7 +18,18 @@ export default defineConfig([
     files: ['**/*.{ts,tsx,mts,cts}'],
     extends: [js.configs.recommended, tseslint.configs.recommended],
   },
+  {
+    name: 'internradar/api-type-aware',
+    files: ['apps/api/src/**/*.ts'],
+    extends: [tseslint.configs.recommendedTypeChecked],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: fileURLToPath(new URL('.', import.meta.url)),
+      },
+    },
+  },
   ...nextVitals.map((config) => ({ ...config, files: ['apps/web/**/*.{js,mjs,ts,tsx}'] })),
-  { settings: { next: { rootDir: 'apps/web/' } } },
+  { settings: { next: { rootDir: fileURLToPath(new URL('./apps/web/', import.meta.url)) } } },
   prettier,
 ]);

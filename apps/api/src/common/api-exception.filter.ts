@@ -16,13 +16,22 @@ export class ApiExceptionFilter implements ExceptionFilter {
       404: 'Recurso não encontrado.',
       503: 'Serviço temporariamente indisponível.',
     };
+    const details = error instanceof HttpException ? error.getResponse() : null;
+    const databaseUnavailable =
+      status === 503 &&
+      typeof details === 'object' &&
+      details !== null &&
+      'code' in details &&
+      details.code === 'DATABASE_UNAVAILABLE';
     const response = host
       .switchToHttp()
       .getResponse<{ status: (code: number) => { json: (body: unknown) => void } }>();
     response.status(status).json({
       statusCode: status,
-      code: codes[status] ?? 'INTERNAL_ERROR',
-      message: messages[status] ?? 'Não foi possível concluir a operação.',
+      code: databaseUnavailable ? 'DATABASE_UNAVAILABLE' : (codes[status] ?? 'INTERNAL_ERROR'),
+      message: databaseUnavailable
+        ? 'Banco de dados temporariamente indisponível.'
+        : (messages[status] ?? 'Não foi possível concluir a operação.'),
     });
   }
 }

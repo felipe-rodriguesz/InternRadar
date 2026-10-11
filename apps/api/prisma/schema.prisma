@@ -1,0 +1,105 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SourcePlatform {
+  GREENHOUSE
+  ASHBY
+  LEVER
+}
+
+enum SourceRegion {
+  GLOBAL
+  EU
+}
+
+enum WorkplaceType {
+  REMOTE
+  HYBRID
+  ONSITE
+  UNKNOWN
+}
+
+enum JobStatus {
+  ACTIVE
+  POSSIBLY_CLOSED
+  CLOSED
+}
+
+enum SyncStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model Company {
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  websiteUrl String?
+  createdAt  DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime    @updatedAt @db.Timestamptz(3)
+  sources    JobSource[]
+}
+
+model JobSource {
+  id        String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  companyId String         @db.Uuid
+  company   Company        @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  platform  SourcePlatform
+  boardKey  String
+  region    SourceRegion   @default(GLOBAL)
+  enabled   Boolean        @default(true)
+  createdAt DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime       @updatedAt @db.Timestamptz(3)
+  jobs      Job[]
+  syncRuns  SyncRun[]
+
+  @@unique([platform, boardKey, region])
+  @@index([companyId])
+}
+
+model Job {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  jobSourceId    String        @db.Uuid
+  source         JobSource     @relation(fields: [jobSourceId], references: [id], onDelete: Restrict)
+  externalId     String
+  title          String
+  description    String?       @db.Text
+  location       String?
+  workplaceType  WorkplaceType @default(UNKNOWN)
+  employmentType String?
+  jobUrl         String
+  publishedAt    DateTime?     @db.Timestamptz(3)
+  firstSeenAt    DateTime      @default(now()) @db.Timestamptz(3)
+  lastSeenAt     DateTime      @default(now()) @db.Timestamptz(3)
+  status         JobStatus     @default(ACTIVE)
+  createdAt      DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime      @updatedAt @db.Timestamptz(3)
+
+  @@unique([jobSourceId, externalId])
+  @@index([firstSeenAt, id])
+  @@index([workplaceType])
+}
+
+model SyncRun {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  jobSourceId  String     @db.Uuid
+  source       JobSource  @relation(fields: [jobSourceId], references: [id], onDelete: Restrict)
+  status       SyncStatus @default(RUNNING)
+  startedAt    DateTime   @default(now()) @db.Timestamptz(3)
+  finishedAt   DateTime?  @db.Timestamptz(3)
+  fetchedCount Int        @default(0)
+  createdCount Int        @default(0)
+  updatedCount Int        @default(0)
+  skippedCount Int        @default(0)
+  errorCode    String?
+  errorMessage String?
+
+  @@index([jobSourceId, startedAt])
+}

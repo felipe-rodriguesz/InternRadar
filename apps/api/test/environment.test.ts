@@ -3,7 +3,11 @@ import { test } from 'node:test';
 import { validateEnvironment } from '../src/config/environment';
 
 test('ambiente aceita portas e origens locais explícitas', () => {
-  const env = validateEnvironment({ API_PORT: '3101', CORS_ORIGINS: 'http://localhost:3100' });
+  const env = validateEnvironment({
+    DATABASE_URL: 'postgresql://fixture:fixture@127.0.0.1:5433/fixture',
+    API_PORT: '3101',
+    CORS_ORIGINS: 'http://localhost:3100',
+  });
   assert.equal(env.API_PORT, 3101);
   assert.deepEqual(env.CORS_ORIGINS, ['http://localhost:3100']);
 });
@@ -17,6 +21,13 @@ test('rejeita exposição de host, portas inválidas e origens remotas/ambíguas
     { CORS_ORIGINS: 'http://localhost:3000/path' },
     { CORS_ORIGINS: '*' },
   ]) {
-    assert.throws(() => validateEnvironment(input), /Configuração inválida/);
+    assert.throws(
+      () =>
+        validateEnvironment({
+          DATABASE_URL: 'postgresql://fixture:fixture@127.0.0.1:5433/fixture',
+          ...input,
+        }),
+      /Configuração inválida/,
+    );
   }
 });
