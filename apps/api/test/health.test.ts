@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import process from 'node:process';
 import { test } from 'node:test';
 import { createApplication } from '../src/application';
 
@@ -16,7 +17,7 @@ test('HTTP real: saúde, alias, CORS e erro sanitizado', async () => {
     assert.deepEqual(await health.json(), {
       status: 'ok',
       service: 'internradar-api',
-      database: { status: 'not_checked' },
+      database: { status: 'connected' },
     });
     const alias = await fetch(`${base}/health`);
     assert.equal(alias.status, 200);
@@ -33,5 +34,25 @@ test('HTTP real: saúde, alias, CORS e erro sanitizado', async () => {
     });
   } finally {
     await app.close();
+  }
+});
+
+test('API com banco inacessível responde 503 sem afirmar conexão ou expor a URL', async () => {
+  const previous = process.env.DATABASE_URL;
+  process.env.DATABASE_URL = 'postgresql://fixture:private-value@127.0.0.1:1/unreachable';
+  const app = await createApplication(false);
+  try {
+    await app.listen(0, '127.0.0.1');
+    const response = await fetch(`${await app.getUrl()}/api/v1/health`);
+    assert.equal(response.status, 503);
+    assert.deepEqual(await response.json(), {
+      statusCode: 503,
+      code: 'DATABASE_UNAVAILABLE',
+      message: 'Banco de dados temporariamente indisponível.',
+    });
+  } finally {
+    await app.close();
+    if (previous === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = previous;
   }
 });

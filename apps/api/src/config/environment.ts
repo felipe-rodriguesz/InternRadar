@@ -27,7 +27,23 @@ function localOrigin(value: string): boolean {
   }
 }
 
+export function validDatabaseUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      ['postgres:', 'postgresql:'].includes(url.protocol) &&
+      ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname) &&
+      !!url.username &&
+      !!url.password &&
+      url.pathname.length > 1
+    );
+  } catch {
+    return false;
+  }
+}
+
 const schema = z.object({
+  DATABASE_URL: z.string().refine(validDatabaseUrl),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_HOST: z.literal('127.0.0.1').default('127.0.0.1'),
   API_PORT: z.coerce.number().int().min(1).max(65535).default(3001),

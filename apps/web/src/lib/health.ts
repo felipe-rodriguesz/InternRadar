@@ -1,8 +1,10 @@
 export interface Health {
   status: 'ok';
   service: 'internradar-api';
-  database: { status: 'connected' | 'not_checked' };
+  database: { status: 'connected' };
 }
+
+export class DatabaseUnavailableError extends Error {}
 
 export async function fetchHealth(signal: AbortSignal): Promise<Health> {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:3001/api/v1';
@@ -10,8 +12,16 @@ export async function fetchHealth(signal: AbortSignal): Promise<Health> {
     cache: 'no-store',
     signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
   });
-  if (!response.ok) throw new Error('A API não está disponível.');
   const body: unknown = await response.json();
+  if (
+    response.status === 503 &&
+    typeof body === 'object' &&
+    body !== null &&
+    'code' in body &&
+    body.code === 'DATABASE_UNAVAILABLE'
+  )
+    throw new DatabaseUnavailableError();
+  if (!response.ok) throw new Error('A API não está disponível.');
   if (
     typeof body !== 'object' ||
     body === null ||
@@ -23,7 +33,7 @@ export async function fetchHealth(signal: AbortSignal): Promise<Health> {
     typeof body.database !== 'object' ||
     body.database === null ||
     !('status' in body.database) ||
-    !['connected', 'not_checked'].includes(String(body.database.status))
+    body.database.status !== 'connected'
   ) {
     throw new Error('Resposta de saúde inválida.');
   }

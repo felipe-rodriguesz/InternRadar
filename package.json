@@ -25,7 +25,11 @@
     "dev": "pnpm --parallel --filter @internradar/api --filter @internradar/web dev",
     "typecheck": "pnpm --recursive typecheck",
     "build": "pnpm --recursive build",
-    "test": "pnpm --recursive --workspace-concurrency=1 test"
+    "test": "pnpm --recursive --workspace-concurrency=1 test",
+    "prisma:generate": "pnpm --filter @internradar/api prisma:generate",
+    "db:migrate": "pnpm --filter @internradar/api db:migrate",
+    "db:seed": "pnpm --filter @internradar/api db:seed",
+    "test:integration": "pnpm --filter @internradar/api test:integration"
   },
   "devDependencies": {
     "@eslint/compat": "2.1.1",

@@ -14,14 +14,13 @@ export default defineConfig({
     {
       command: 'pnpm --filter @internradar/api start',
       cwd: '../..',
-      url: 'http://127.0.0.1:3101/api/v1/health',
-      env: { API_PORT: '3101', CORS_ORIGINS: 'http://127.0.0.1:3100' },
+      url: 'http://127.0.0.1:3001/api/v1/health',
+      env: { API_PORT: '3001', CORS_ORIGINS: 'http://127.0.0.1:3100' },
       reuseExistingServer: false,
     },
     {
-      command: 'pnpm dev --port 3100',
+      command: 'pnpm start --port 3100',
       url: 'http://127.0.0.1:3100',
-      env: { NEXT_PUBLIC_API_BASE_URL: 'http://127.0.0.1:3101/api/v1' },
       reuseExistingServer: false,
       timeout: 120000,
     },
