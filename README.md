@@ -6,7 +6,7 @@ A [especificação oficial v1.0](docs/requirements.md) permanece íntegra. [Alte
 
 ## Estado e arquitetura
 
-S0-01 integrada pelo [PR #2](https://github.com/felipe-rodriguesz/InternRadar/pull/2). O lote S0-02/S0-03 prepara documentação e PostgreSQL local. S0-02 está finalizada; a homologação do banco está bloqueada por um entrypoint vazio na imagem local, e o lote segue em Draft PR. Resultados e pendências estão no [acompanhamento da Sprint 0](docs/sprint-0.md).
+S0-01 integrada pelo [PR #2](https://github.com/felipe-rodriguesz/InternRadar/pull/2). S0-02/S0-03 entregam documentação e PostgreSQL local homologado, com revisão no [PR #5](https://github.com/felipe-rodriguesz/InternRadar/pull/5). Resultados e pendências estão no [acompanhamento da Sprint 0](docs/sprint-0.md).
 
 ```text
 apps/web/                 Frontend Next.js, inicialização na S0-04
@@ -56,7 +56,7 @@ pnpm db:test:stop
 pnpm db:stop
 ```
 
-Desenvolvimento usa `127.0.0.1:5432`; testes usam `127.0.0.1:5433`, com portas configuráveis, clusters/redes/volumes distintos e profile `test`. Imagem PostgreSQL **17.11-bookworm**, fixada por digest OCI. Stop/restart preservam os volumes diários.
+Desenvolvimento usa `127.0.0.1:5432`; testes usam `127.0.0.1:5433`, com portas configuráveis, clusters/redes/volumes distintos e profile `test`. Imagem PostgreSQL **17.11-trixie**, fixada por digest OCI. Stop/restart preservam os volumes diários. A [recuperação da imagem](docs/postgresql-recovery.md) documenta a mudança de base Debian e os cuidados com clusters existentes.
 
 `db:verify` cria um projeto Docker temporário próprio e testa configuração, saúde, conexão, autenticação, persistência após restart/recriação e isolamento. Ao finalizar, para seus containers e preserva os volumes; o nome do projeto é informado no terminal. Não usa nem apaga dados diários. O teste é independente do `.env` local.
 
