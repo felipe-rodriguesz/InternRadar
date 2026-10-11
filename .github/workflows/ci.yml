@@ -82,7 +82,7 @@ jobs:
         run: pnpm typecheck
       - name: Build both workspaces
         run: pnpm build
-      - name: Offline unit and connector tests
+      - name: 'Offline unit tests: Greenhouse, Ashby and Lever'
         run: pnpm --filter @internradar/api test:unit
       - name: Migrate and seed the application database
         run: |
@@ -90,11 +90,11 @@ jobs:
           pnpm db:seed
       - name: API HTTP tests
         run: pnpm --filter @internradar/api test:http
-      - name: Persistence, sync and jobs HTTP in a separate PostgreSQL cluster
+      - name: Persistence, multi-platform sync and catalog HTTP in isolated PostgreSQL
         run: pnpm test:integration
       - name: Install Chromium and Firefox with runner dependencies
         run: pnpm --filter @internradar/web exec playwright install --with-deps chromium firefox
-      - name: Empty and populated PostgreSQL browser tests with managed servers
+      - name: 'Chromium and Firefox: jobs, details, sources and history'
         run: pnpm --filter @internradar/web test
       - name: Workspace and tracked-file integrity
         run: |

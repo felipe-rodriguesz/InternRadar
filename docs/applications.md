@@ -85,3 +85,14 @@ Os testes de navegador usam a URL pública padrão `http://127.0.0.1:3001/api/v1
 `pnpm --filter @internradar/web test` chama o runner no workspace API, onde já existem Prisma/pg/tsx. Ele verifica a identidade do cluster, migra um schema novo, executa vazio real em Chromium/Firefox, grava 23 anúncios sintéticos por SyncService e executa os demais testes com API real. Reutiliza os mesmos builds e schema nas duas fases, reiniciando apenas seus servidores Node. A API recebe DATABASE_URL de teste no processo; o ambiente privado diário não é editado. Execução direta de Playwright sem o runner é bloqueada para não consultar acidentalmente a base diária como fixture.
 
 Testes de sucesso não interceptam a API. Falhas de rede/500/503 são simuladas apenas na interface; falhas PostgreSQL reais são exercitadas por testes de integração/HTTP. Relatórios são gerados e ignorados. Nenhum teste chama Greenhouse na CI.
+
+## Detalhes e acompanhamento — Sprint 2
+
+- `/jobs/[id]`: título/empresa, descrição em texto, opcionais, origem, datas e status com ressalva de disponibilidade. Link externo http(s) validado com noopener/noreferrer; nenhuma renderização de HTML externo. A navegação da listagem preserva a pesquisa na volta.
+- `/sources`: fontes de leitura, filtros por plataforma/estado, última tentativa distinta do último sucesso e links para vagas/histórico.
+- `/sync-runs`: histórico paginado, filtros por fonte (URL), plataforma e resultado, contadores, duração e código sanitizado; RUNNING sem conclusão aparece como incompleto.
+- Loading, vazio, erro, retry e layout 375px são testados em Chromium/Firefox. O destino do atalho “Pular para o conteúdo” é focável nas novas páginas; regressão específica cobre o comportamento do Firefox.
+
+Novos contratos HTTP estão em [synchronization.md](synchronization.md). Os testes usam 23 vagas listadas, duas vagas de detalhe não listadas e registros de fontes/histórico **sintéticos**, apenas no schema isolado do runner. Incluem 404/400, URL legada inválida, data/descrição ausentes, publicação explícita, texto que parece HTML, fonte desabilitada/nunca sincronizada e RUNNING antigo. Nenhuma fixture é gravada no banco diário.
+
+As suítes de API incluem os conectores Ashby/Lever offline e integração HTTP real do catálogo. Para rodar browsers, libere 3001/3100; os processos gerenciados pelo teste encerram ao final. Inicie novamente `pnpm dev` para o ambiente diário.

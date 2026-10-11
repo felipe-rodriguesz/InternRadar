@@ -5,17 +5,18 @@ Referência: [especificação v1.0](requirements.md), preservada, e [decisões c
 ```mermaid
 flowchart LR
   Browser[Navegador] -->|Página e JavaScript| Web[apps/web: Next.js]
-  Browser -->|React consulta saúde e vagas| API[apps/api: NestJS modular]
+  Browser -->|React consulta saúde, vagas e fontes| API[apps/api: NestJS modular]
   API --> Prisma[Prisma + adapter-pg]
   Prisma --> DB[(PostgreSQL desenvolvimento)]
-  API --> Connectors[ConnectorsModule: Greenhouse]
-  Connectors --> Sources[API pública Greenhouse]
+  API --> Connectors[ConnectorsModule: registry de adapters]
+  Connectors --> Sources[APIs públicas Greenhouse / Ashby / Lever]
   CLI[CLI local] --> Sync[SyncModule / SyncService]
   Sync --> Connectors
   Sync --> Prisma
   API --> Jobs[JobsModule: filtros e paginação]
   Jobs --> Prisma
-  API -. próximos adapters .-> Future[Ashby / Lever]
+  API --> Catalog[CatalogModule: empresas / fontes / histórico]
+  Catalog --> Prisma
   Tests[Testes de persistência] --> TestDB[(PostgreSQL testes: profile test)]
 ```
 
@@ -28,7 +29,7 @@ flowchart LR
 | Prisma     | Entidades, migrações e seed idempotente                 | Implementado e testado |
 | CI         | Checks reais em PRs                                     | Workflow em PRs        |
 
-O backend terá fronteiras entre integração externa, normalização, serviços de domínio e persistência. Continuará um único aplicativo; adicionar uma plataforma não deve alterar a listagem pública de vagas. Saúde, configuração e persistência estão implementadas. ConnectorsModule exporta o adapter Greenhouse; transporte/normalização não acessam Prisma. SyncModule orquestra coleta e gravação pelo CLI, fora do servidor HTTP. JobsModule consulta dados persistidos, independente do conector. Outros adapters ficam para S2-01.
+O backend terá fronteiras entre integração externa, normalização, serviços de domínio e persistência. Continuará um único aplicativo; adicionar uma plataforma não deve alterar a listagem pública de vagas. Saúde, configuração e persistência estão implementadas. ConnectorsModule exporta um registro por plataforma com os três adapters; transporte/normalização não acessam Prisma. SyncModule orquestra coleta e gravação pelo CLI, fora do servidor HTTP. JobsModule consulta dados persistidos, independente do conector. CatalogModule oferece consultas de empresas, fontes e histórico sem executar coletas.
 
 ## Decisões
 
@@ -45,4 +46,6 @@ Credenciais ficam na raiz privada; somente valores públicos permitidos chegam a
 
 ADR-004 registra o contrato implementado. ADR-005 consolida datas/status, transações e execuções incompletas. [Conectores](connectors.md) e [CI](ci.md) descrevem operação e testes.
 
-O fluxo real de saúde e os comandos estão em [applications.md](applications.md). Company → JobSource → Job/SyncRun foi implementado por migração; GET /api/v1/jobs é o primeiro endpoint de consulta de negócio. [Sincronização e API](synchronization.md) detalha o fluxo completo.
+O fluxo real de saúde e os comandos estão em [applications.md](applications.md). Company → JobSource → Job/SyncRun foi implementado por migração; JobsModule oferece listagem e detalhe; CatalogModule expõe empresas, fontes e execuções. [Sincronização e API](synchronization.md) detalha o fluxo completo.
+
+S2-01/02/03: [ADR-009](decisions/ADR-009-visibilidade-e-consultas.md) documenta visibilidade Ashby e contratos de leitura. As páginas /jobs/[id], /sources e /sync-runs consomem somente a API InternRadar.

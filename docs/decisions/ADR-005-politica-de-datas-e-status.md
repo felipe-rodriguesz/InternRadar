@@ -31,3 +31,5 @@ received/fetched inclui rejeitados; accepted é o conjunto válido/único após 
 Inferir publishedAt da coleta ou fechar por ausência violaria regras do MVP. Transação envolvendo HTTP ampliaria locks e risco de timeout. Apenas consultar antes de inserir, sem lock/constraint, tornaria contagens incorretas sob concorrência. Redis/filas e limpeza automática de execuções incompletas acrescentariam infraestrutura e risco sem necessidade neste lote.
 
 Referências: [locks PostgreSQL 17](https://www.postgresql.org/docs/17/explicit-locking.html), [transações Prisma 7](https://www.prisma.io/docs/orm/v7/prisma-client/queries/transactions), [operação](../synchronization.md).
+
+S2-01: visibilidade isListed é independente de status. False explícito oculta busca; ausência de anúncio continua sem transição automática. Ashby publishedAt representa a última publicação informada pela origem; Lever createdAt continua sem equivalência comprovada e não é usado como publicação.
