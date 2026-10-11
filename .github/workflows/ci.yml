@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Quality and integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      # Placeholder only: isolated CI services use trust; no user credentials.
+      DATABASE_URL: postgresql://internradar:ci-unused@127.0.0.1:15432/internradar
+      TEST_DATABASE_URL: postgresql://internradar_test:ci-unused@127.0.0.1:15433/internradar_test
+      POSTGRES_TEST_DB: internradar_test
+      POSTGRES_TEST_PORT: '15433'
+      API_HOST: 127.0.0.1
+      API_PORT: '3001'
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:3001/api/v1
+    services:
+      postgres:
+        image: postgres:17.11-trixie@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
+        env:
+          POSTGRES_USER: internradar
+          POSTGRES_DB: internradar
+          # Only on a disposable GitHub-hosted runner, bound to loopback.
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 127.0.0.1:15432:5432
+        options: >-
+          --health-cmd "pg_isready -U internradar -d internradar"
+          --health-interval 5s --health-timeout 3s --health-retries 12
+      postgres-test:
+        image: postgres:17.11-trixie@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
+        env:
+          POSTGRES_USER: internradar_test
+          POSTGRES_DB: internradar_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 127.0.0.1:15433:5432
+        options: >-
+          --health-cmd "pg_isready -U internradar_test -d internradar_test"
+          --health-interval 5s --health-timeout 3s --health-retries 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Node from the project version file
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: pnpm from packageManager and store cache
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          run_install: false
+          cache: true
+      - name: Reproducible installation
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies
+      - name: Generate Prisma Client
+        run: pnpm prisma:generate
+      - name: Lint
+        run: pnpm lint
+      - name: Formatting
+        run: pnpm format:check
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Build both workspaces
+        run: pnpm build
+      - name: Offline unit and connector tests
+        run: pnpm --filter @internradar/api test:unit
+      - name: Migrate and seed the application database
+        run: |
+          pnpm db:migrate
+          pnpm db:seed
+      - name: API HTTP tests
+        run: pnpm --filter @internradar/api test:http
+      - name: Persistence in a separate PostgreSQL cluster
+        run: pnpm test:integration
+      - name: Install Chromium and Firefox with runner dependencies
+        run: pnpm --filter @internradar/web exec playwright install --with-deps chromium firefox
+      - name: Browser tests with managed production servers
+        run: pnpm --filter @internradar/web test
+      - name: Workspace and tracked-file integrity
+        run: |
+          pnpm workspace:list
+          git diff --exit-code
+          git diff --check
+          sha256sum --check <<< '917610528b367257bc1fe2da1a02ac1527e30e6cd2f52052e45cd95e7414e65e  docs/requirements.md'
