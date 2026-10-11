@@ -6,7 +6,7 @@ A [especificação oficial v1.0](docs/requirements.md) está preservada. [Decis�
 
 ## Estado atual
 
-S0-01/S0-02/S0-03 integradas. O lote S0-04/S0-05 implementa Next.js, NestJS, saúde com consulta real ao PostgreSQL, schema Prisma, migração e seed idempotente. A página inicial informa conexão, carregamento, falhas e nova tentativa. Não há coleta, listagem de vagas ou sincronizações implementadas nesta entrega.
+S0-01 a S0-05 integradas. A fundação implementa Next.js, NestJS, saúde com consulta real ao PostgreSQL, schema Prisma, migração e seed idempotente. A página inicial informa conexão, carregamento, falhas e nova tentativa. O lote atual adiciona CI e coleta/normalização Greenhouse somente por comando técnico, sem gravação. Sincronização e listagem permanecem nas próximas entregas.
 
 ```text
 apps/web/src/app/           Next.js App Router, layout e página inicial
@@ -15,9 +15,11 @@ apps/web/test/              Testes Chromium/Firefox com Playwright
 apps/api/src/config/        Ambiente privado validado
 apps/api/src/health/        Saúde da API e consulta real ao banco
 apps/api/src/database/      Prisma Client, adapter-pg e módulo NestJS
+apps/api/src/connectors/    Contratos, normalização e Greenhouse
 apps/api/prisma/            Schema, migrações e seed
 apps/api/test/              Testes HTTP, ambiente e persistência
 compose.yaml               PostgreSQL desenvolvimento/testes separados
+.github/workflows/ci.yml    Checks e integração no GitHub Actions
 docs/                      Operação, decisões e evidências
 ```
 
@@ -91,10 +93,21 @@ pnpm workspace:list
 
 Para executar os artefatos compilados, após `pnpm build`, use `pnpm --filter @internradar/api start` e `pnpm --filter @internradar/web start` em terminais separados. Encerre os aplicativos com Ctrl+C; `pnpm db:stop` e `pnpm db:test:stop` param os bancos sem apagar volumes.
 
+## Greenhouse — consulta sem persistência
+
+```sh
+pnpm test:unit
+pnpm greenhouse:check figma
+```
+
+O primeiro comando testa contratos, normalização e falhas sem internet ou banco. O segundo consulta o board público real e imprime contagens/diagnóstico, sem importar vagas no PostgreSQL. Retorna erro se a coleta falhar; não simula sucesso. Não há endpoint administrativo.
+
+[Conectores](docs/connectors.md) descreve mapeamento, URLs permitidas, sanitização, timeout/retries, fixtures e a verificação real. Datas/modalidades ausentes permanecem desconhecidas. O contrato permite adicionar outros adapters sem alterar a futura listagem.
+
 ## Contribuição e próximos passos
 
 [CONTRIBUTING.md](CONTRIBUTING.md) descreve Issue → branch → Conventional Commits → checks → PR → revisão → merge autorizado. As entregas deste lote estão nas [Issues #6](https://github.com/felipe-rodriguesz/InternRadar/issues/6) e [#7](https://github.com/felipe-rodriguesz/InternRadar/issues/7).
 
-S0-06 adicionará GitHub Actions com estes comandos reais. Conectores, sincronização e consulta de vagas pertencem às Sprints 1/2. Deploy público, autenticação, licença e automações continuam fora deste lote; o projeto deve permanecer local.
+[GitHub Actions](docs/ci.md) executa checks, PostgreSQL isolado e browsers em PRs; o resultado remoto deve ser conferido nos Checks. [Sprint 1](docs/sprint-1.md) registra o lote das Issues #9/#10/#11. Sincronização, API paginada e interface de vagas continuam para S1-03/S1-04/S1-05; Ashby/Lever para S2-01. Deploy público, autenticação, licença e automações continuam fora deste lote; o projeto deve permanecer local.
 
 Os testes de navegador usam a URL pública padrão `http://127.0.0.1:3001/api/v1` incorporada ao build. Se alterá-la para desenvolvimento, refaça o build com esse valor antes de executar a suíte. Os servidores de teste recusam portas já ocupadas.

@@ -466,3 +466,13 @@ No checkout final: Prisma validate e migrate status aprovados (uma migração ap
 Revisão dos 71 arquivos candidatos: JSON/YAML/LF válidos, nenhuma credencial local/padrão de token/chave privada encontrado; bundles públicos sem DATABASE_URL ou senhas do `.env`. Exemplos/lockfile/migrações continuam versionáveis, segredos/artefatos ignorados. Especificação idêntica por bytes/SHA-256 ao original; Compose, digest, tsconfig.base, gitattributes e EditorConfig preservados.
 
 Inventário final: 8 containers, 7 volumes, 12 redes e 3 imagens. Os 5 containers, 4 volumes e 9 redes do inventário inicial permanecem presentes. Dois containers diários healthy, publicados somente em 127.0.0.1:15432/15433. A comparação do kernel, normalizando prefixos de prioridade do baseline, confirmou que os erros de I/O presentes eram anteriores ao lote; nenhum novo erro foi identificado.
+
+## S0-06 — CI e transição para Sprint 1
+
+PR #8 integrado por rebase em 11/10/2026, main `200298c8b0409eb019579665f06f8f4dacf76b36`, com três commits preservados; Issues #6/#7 fechadas automaticamente. Nenhuma branch antiga excluída. Nova branch `feat/s0-06-s1-01-02-ci-greenhouse`.
+
+[S0-06 / Issue #9](https://github.com/felipe-rodriguesz/InternRadar/issues/9) pertence ao Milestone Sprint 0. Issues #10/#11 e Milestone Sprint 1 acompanham contratos/Greenhouse; [registro](sprint-1.md).
+
+Pipeline implementada em `.github/workflows/ci.yml`, com versões do projeto, actions por SHA, token contents:read, dois clusters efêmeros PostgreSQL, geração/migração/seed, lint/format/strict/build, testes unitários/HTTP/persistência e Playwright Chromium/Firefox. Serviços pertencem exclusivamente ao runner; Compose/digest local permanecem intactos. [Operação e segurança](ci.md).
+
+S0-06-V01/TA-01/TA-12 remotos aguardam a execução efetiva do workflow após publicação do PR. Nenhuma homologação remota é inferida somente da presença do YAML. A pendência Ashby e o acompanhamento da major do ESLint permanecem registrados.

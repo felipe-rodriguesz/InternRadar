@@ -62,7 +62,7 @@ sequenceDiagram
 - `pnpm dev`: inicia API/web com recarga; scripts individuais via `pnpm --filter @internradar/api dev` ou `@internradar/web`.
 - `pnpm typecheck`: gera client Prisma/tipos Next e verifica ambas as aplicações sem emitir build.
 - `pnpm build`: gera client e compila API; produz build otimizado Next.js.
-- `pnpm test`: testes de ambiente/HTTP da API, seguidos dos testes web Chromium/Firefox. Exige API/web compiladas e banco diário ativo; consultas de saúde são somente leitura.
+- `pnpm test`: testes unitários de ambiente/conectores e HTTP da API, seguidos dos testes web Chromium/Firefox. Exige API/web compiladas e banco diário ativo; consultas de saúde são somente leitura.
 - `pnpm test:integration`: migração e persistência reais no cluster de testes. Valida nome/porta configurados e identificadores distintos dos clusters antes de escrever. Cada execução cria um schema `check_<uuid>` novo; dados/schemas são preservados e volumes não são recriados.
 - `pnpm --filter @internradar/api db:migrate:status`: confirma migrações aplicadas.
 
@@ -70,6 +70,8 @@ Playwright usa os builds de produção e gerencia servidores próprios em 3100/3
 
 Preparação dos browsers: `pnpm --filter @internradar/web exec playwright install chromium firefox`. O ambiente WSL desta entrega já tinha bibliotecas de sistema suficientes. Em outro sistema, dependências nativas ausentes exigem preparação pelo operador; o projeto não instala pacotes globais automaticamente.
 
-Relatórios/traces/screenshots e `next-env.d.ts` são gerados e ignorados. `next dev` escreve `apps/web/AGENTS.md`, mantido no Git. Não há CI neste lote: S0-06 reutilizará os comandos e precisará provisionar PostgreSQL e browsers.
+Relatórios/traces/screenshots e `next-env.d.ts` são gerados e ignorados. `next dev` escreve `apps/web/AGENTS.md`, mantido no Git. A [CI](ci.md) reutiliza os comandos com PostgreSQL/browsers no runner. O resultado remoto é conferido no PR; consulta real do Greenhouse não é executada pela pipeline.
 
 Os testes de navegador usam a URL pública padrão `http://127.0.0.1:3001/api/v1` incorporada ao build. Se alterá-la para desenvolvimento, refaça o build com esse valor antes de executar a suíte. Os servidores de teste recusam portas já ocupadas.
+
+`pnpm test:unit` não exige banco e inclui contratos/normalização/Greenhouse. `pnpm --filter @internradar/api test:http` executa somente HTTP real; essa separação evita testes duplicados na CI. [Conectores e demonstração](connectors.md).

@@ -95,4 +95,4 @@ O seed faz upsert das duas [fontes verificadas](seed-sources.md), preserva a ass
 
 O PostgreSQL 16 nativo do Ubuntu já ocupava 5432; não foi parado nem alterado. A tentativa inicial deixou `internradar-postgres-1` em estado created, com volume `internradar_postgres_data`, preservados. O `.env` privado usa COMPOSE_PROJECT_NAME=internradar-apps, POSTGRES_PORT=15432 e POSTGRES_TEST_PORT=15433, com URLs coerentes. Os volumes diários novos são `internradar-apps_postgres_data` e `internradar-apps_postgres_test_data`; ambos foram inicializados com o digest Trixie homologado.
 
-Todos os recursos das recuperações anteriores continuam preservados. Não foi repetida a suíte db:verify neste lote: sua homologação anterior permanece válida, e a nova entrega testa a aplicação nos dois clusters diários separados. A CI correspondente será definida na S0-06.
+Todos os recursos das recuperações anteriores continuam preservados. Não foi repetida a suíte db:verify neste lote: sua homologação anterior permanece válida, e a nova entrega testa a aplicação nos dois clusters diários separados. A [CI](ci.md) usa dois service containers efêmeros no runner, sem acessar estes volumes locais.

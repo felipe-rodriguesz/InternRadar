@@ -1,6 +1,6 @@
 # ADR-003 — Integração por APIs públicas
 
-Status: aceito para o MVP; implementação pendente das Sprints 1/2. Referências: RF-004–012; RNF-002/007/008/014/019; seção 7.
+Status: aceito para o MVP; Greenhouse implementado em S1-02; demais adapters nas próximas entregas. Referências: RF-004–012; RNF-002/007/008/014/019; seção 7.
 
 ## Contexto
 
@@ -28,3 +28,5 @@ Adapters isolam mudanças externas e permitem fixtures de sucesso, vazio e erro.
 Scraping e APIs privadas introduziriam restrições e instabilidade. Consultas diretas do navegador acoplariam a interface às plataformas e impediriam persistência central. Um coletor genérico ocultaria diferenças importantes dos contratos.
 
 Este ADR não inclui conectores ou consultas externas executáveis na S0-02/S0-03.
+
+S1-01/S1-02: [ADR-004](ADR-004-contrato-dos-conectores.md) detalha o contrato implementado, resultado de coleta e limites. A consulta Greenhouse foi comprovada sem persistência; sincronização continua fora deste lote.
