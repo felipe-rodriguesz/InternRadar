@@ -1,4 +1,4 @@
-# Aplicações e testes da fundação
+# Aplicações e testes
 
 Escopo: S0-04/S0-05, RF-001/002/003/018, HU-01/02/10/12. [Arquitetura](architecture.md), [banco](database.md) e [ADR-008](decisions/ADR-008-apps-prisma-runtime.md).
 
@@ -62,7 +62,7 @@ sequenceDiagram
 - `pnpm dev`: inicia API/web com recarga; scripts individuais via `pnpm --filter @internradar/api dev` ou `@internradar/web`.
 - `pnpm typecheck`: gera client Prisma/tipos Next e verifica ambas as aplicações sem emitir build.
 - `pnpm build`: gera client e compila API; produz build otimizado Next.js.
-- `pnpm test`: testes unitários de ambiente/conectores e HTTP da API, seguidos dos testes web Chromium/Firefox. Exige API/web compiladas e banco diário ativo; consultas de saúde são somente leitura.
+- `pnpm test`: testes unitários de ambiente/conectores e HTTP da API, seguidos dos testes web Chromium/Firefox. Exige API/web compiladas e banco diário ativo; consultas de saúde são somente leitura; o runner web cria seu próprio schema no cluster de testes.
 - `pnpm test:integration`: migração e persistência reais no cluster de testes. Valida nome/porta configurados e identificadores distintos dos clusters antes de escrever. Cada execução cria um schema `check_<uuid>` novo; dados/schemas são preservados e volumes não são recriados.
 - `pnpm --filter @internradar/api db:migrate:status`: confirma migrações aplicadas.
 
@@ -75,3 +75,13 @@ Relatórios/traces/screenshots e `next-env.d.ts` são gerados e ignorados. `next
 Os testes de navegador usam a URL pública padrão `http://127.0.0.1:3001/api/v1` incorporada ao build. Se alterá-la para desenvolvimento, refaça o build com esse valor antes de executar a suíte. Os servidores de teste recusam portas já ocupadas.
 
 `pnpm test:unit` não exige banco e inclui contratos/normalização/Greenhouse. `pnpm --filter @internradar/api test:http` executa somente HTTP real; essa separação evita testes duplicados na CI. [Conectores e demonstração](connectors.md).
+
+## Vagas — S1-03/S1-04/S1-05
+
+`/jobs` usa App Router com Suspense e componente cliente; filtros/paginação vivem na URL. Busca por formulário evita chamadas a cada tecla. Requisições substituídas são abortadas, timeout de cinco segundos, erro não é interpretado como vazio e links externos são validados. Conteúdo é texto React, nunca HTML executável. A rota inicial mantém a saúde e oferece acesso à listagem.
+
+`GET /api/v1/jobs` valida queries com Zod e retorna erros 400 úteis/sanitizados. JobsModule não executa sincronização. CLI carrega apenas SyncModule, sem abrir porta HTTP. Os comandos e contrato estão em [synchronization.md](synchronization.md).
+
+`pnpm --filter @internradar/web test` chama o runner no workspace API, onde já existem Prisma/pg/tsx. Ele verifica a identidade do cluster, migra um schema novo, executa vazio real em Chromium/Firefox, grava 23 anúncios sintéticos por SyncService e executa os demais testes com API real. Reutiliza os mesmos builds e schema nas duas fases, reiniciando apenas seus servidores Node. A API recebe DATABASE_URL de teste no processo; o ambiente privado diário não é editado. Execução direta de Playwright sem o runner é bloqueada para não consultar acidentalmente a base diária como fixture.
+
+Testes de sucesso não interceptam a API. Falhas de rede/500/503 são simuladas apenas na interface; falhas PostgreSQL reais são exercitadas por testes de integração/HTTP. Relatórios são gerados e ignorados. Nenhum teste chama Greenhouse na CI.

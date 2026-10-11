@@ -96,3 +96,9 @@ O seed faz upsert das duas [fontes verificadas](seed-sources.md), preserva a ass
 O PostgreSQL 16 nativo do Ubuntu já ocupava 5432; não foi parado nem alterado. A tentativa inicial deixou `internradar-postgres-1` em estado created, com volume `internradar_postgres_data`, preservados. O `.env` privado usa COMPOSE_PROJECT_NAME=internradar-apps, POSTGRES_PORT=15432 e POSTGRES_TEST_PORT=15433, com URLs coerentes. Os volumes diários novos são `internradar-apps_postgres_data` e `internradar-apps_postgres_test_data`; ambos foram inicializados com o digest Trixie homologado.
 
 Todos os recursos das recuperações anteriores continuam preservados. Não foi repetida a suíte db:verify neste lote: sua homologação anterior permanece válida, e a nova entrega testa a aplicação nos dois clusters diários separados. A [CI](ci.md) usa dois service containers efêmeros no runner, sem acessar estes volumes locais.
+
+## Sincronização e testes da listagem
+
+S1-03 utiliza as tabelas/constraints existentes, sem nova migração nem mudança de digest. Persistência usa upsert e lock da linha da fonte somente durante a transação; gravação das vagas e SUCCESS são atômicos. [ADR-005](decisions/ADR-005-politica-de-datas-e-status.md) descreve o tratamento de rollback/RUNNING.
+
+`test:integration` executa a suíte original em schema check_<uuid> e sincronização/HTTP em jobs_<uuid>. O runner de browsers cria browser_<uuid>, primeiro vazio e depois alimentado por fixtures identificadas. Guardas comparam porta, banco e system_identifier antes de qualquer escrita; contagens do banco diário são verificadas no final. Schemas permanecem disponíveis, inclusive triggers que simulam falhas exclusivamente no schema de testes. Não há DROP, reset ou limpeza de recursos antigos.

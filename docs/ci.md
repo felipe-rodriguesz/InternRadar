@@ -11,8 +11,8 @@ Um job `Quality and integration` em ubuntu-24.04, timeout de 25 minutos. Executa
 3. Lint, Prettier, strict e builds dos dois aplicativos.
 4. Testes unitários/contratos offline.
 5. Migração e seed no banco efêmero da aplicação.
-6. Testes HTTP reais e persistência em outro cluster PostgreSQL.
-7. Instalação Chromium/Firefox e bibliotecas somente no runner; Playwright inicia API/web compiladas, espera saúde e encerra os processos próprios.
+6. Testes HTTP de saúde; persistência, sincronização (incluindo falhas SQL/concorrência) e HTTP /jobs em schemas novos no cluster separado.
+7. Instalação Chromium/Firefox somente no runner. O runner de testes migra um schema browser isolado, testa banco vazio, grava fixtures por SyncService e valida pesquisa/paginação/estados/teclado. Playwright inicia API/web compiladas, espera saúde e encerra os processos próprios em cada fase.
 8. Descoberta dos workspaces, ausência de alterações rastreadas e SHA-256 da especificação.
 
 Não são feitos builds duplicados para os browsers. Geração Prisma nos scripts de typecheck/build permanece para permitir execução independente desses comandos. O cache armazena somente o store pnpm, com chave do lockfile; não inclui .env, banco, node_modules, builds ou traces. Browsers não têm cache separado para evitar complexidade sem medição de benefício.
@@ -49,3 +49,5 @@ No GitHub, abra o check do PR ou use `gh run list --branch <branch>` e `gh run v
 A configuração não torna checks obrigatórios nem modifica proteção da main. Homologação inicial aprovada no [run 38121178306](https://github.com/felipe-rodriguesz/InternRadar/actions/runs/38121178306): todos os passos concluídos, incluindo 53 testes e finalização dos serviços. O último HEAD deve ter seu próprio check aprovado no [PR #12](https://github.com/felipe-rodriguesz/InternRadar/pull/12); a Issue #9 registra a execução mais recente.
 
 Referências: [services PostgreSQL](https://docs.github.com/en/actions/tutorials/use-containerized-services/create-postgresql-service-containers), [setup-node](https://github.com/actions/setup-node), [pnpm/action-setup](https://github.com/pnpm/action-setup).
+
+S1-03/S1-04/S1-05 amplia a mesma pipeline, sem novas dependências/actions ou permissões. Os testes obrigatórios continuam offline em relação às fontes externas. Não usa o banco da aplicação para fixtures de vagas; ambos os clusters existem apenas no runner.
