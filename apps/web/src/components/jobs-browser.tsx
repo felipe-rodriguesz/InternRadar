@@ -31,7 +31,7 @@ export function JobsLoading() {
   );
 }
 
-function JobCard({ job }: { job: JobItem }) {
+function JobCard({ job, query }: { job: JobItem; query: string }) {
   const url = safeExternalUrl(job.jobUrl);
   return (
     <li className="job-card">
@@ -39,7 +39,13 @@ function JobCard({ job }: { job: JobItem }) {
         <p className="job-company">{job.company.name}</p>
         <span className="source-badge">{platforms[job.source.platform]}</span>
       </div>
-      <h2>{job.title}</h2>
+      <h2>
+        <Link
+          href={`/jobs/${job.id}?from=${encodeURIComponent(`/jobs${query ? `?${query}` : ''}`)}`}
+        >
+          {job.title}
+        </Link>
+      </h2>
       <div className="job-facts">
         <span>{job.location ?? 'Localização não informada'}</span>
         <span>
@@ -158,7 +164,7 @@ function Results({ query }: { query: string }) {
       {data.items.length ? (
         <ul className="jobs-list">
           {data.items.map((job) => (
-            <JobCard job={job} key={job.id} />
+            <JobCard job={job} query={query} key={job.id} />
           ))}
         </ul>
       ) : (

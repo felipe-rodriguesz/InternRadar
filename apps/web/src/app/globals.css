@@ -677,3 +677,222 @@ footer a {
     padding: 12px 6px;
   }
 }
+
+/* Details and provenance use the same quiet surfaces and typography as the search. */
+.back-link {
+  display: inline-block;
+  color: var(--accent, #0c7263);
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 2rem;
+  align-items: start;
+}
+.detail-heading h1 {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  margin: 1rem 0 1.5rem;
+  overflow-wrap: anywhere;
+}
+.detail-heading .source-badge {
+  display: inline-block;
+  margin-top: 0.75rem;
+}
+.description-panel {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid #d9e0d7;
+}
+.description-panel h2,
+.detail-aside h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.job-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.85;
+  color: #40535a;
+}
+.detail-aside {
+  background: white;
+  border: 1px solid #dce2da;
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+.detail-aside > p {
+  line-height: 1.65;
+}
+.metadata-list {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.metadata-list dt,
+.run-dates dt {
+  font-size: 0.78rem;
+  color: #5b6968;
+  margin-bottom: 0.25rem;
+}
+.metadata-list dd,
+.run-dates dd {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.original-button {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+.detail-aside .scope-note {
+  margin-top: 1rem;
+}
+.sources-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  list-style: none;
+  padding: 0;
+}
+.source-card,
+.run-card {
+  border: 1px solid #dce2da;
+  background: white;
+  border-radius: 18px;
+  padding: 1.5rem;
+  min-width: 0;
+}
+.source-card h2,
+.run-card h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  overflow-wrap: anywhere;
+}
+.source-enabled {
+  font-size: 0.75rem;
+  color: #52645e;
+}
+.source-board {
+  color: #63736c;
+  font-size: 0.85rem;
+  margin: 0.35rem 0 1.3rem;
+  overflow-wrap: anywhere;
+}
+.run-status {
+  display: inline-flex;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.status-success {
+  background: #e2f1e9;
+  color: #25664b;
+}
+.status-failed {
+  background: #fae8e4;
+  color: #8d392d;
+}
+.status-running {
+  background: #f7edd3;
+  color: #76560f;
+}
+.status-never {
+  background: #edf0ed;
+  color: #52645e;
+}
+.source-warning,
+.visibility-note {
+  font-size: 0.85rem;
+  color: #8d392d;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.source-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  border-top: 1px solid #e7ebe5;
+  padding-top: 1.25rem;
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+}
+.catalog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1rem;
+}
+.catalog-filters .field {
+  flex: 1 1 180px;
+}
+.catalog-filters > .text-link {
+  padding-bottom: 0.9rem;
+}
+.runs-list {
+  list-style: none;
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+}
+.run-dates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.run-counters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  border-top: 1px solid #e7ebe5;
+  padding-top: 1rem;
+}
+.run-counters dt {
+  font-size: 0.78rem;
+  color: #52645e;
+}
+.run-counters dd {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.run-card > .scope-note,
+.run-card > .source-warning {
+  margin-top: 1rem;
+}
+@media (max-width: 950px) {
+  .sources-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .sources-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .run-dates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .run-counters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .header-nav {
+    flex-wrap: wrap;
+  }
+  .source-card,
+  .run-card {
+    padding: 1.15rem;
+  }
+  .job-card-heading {
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+}

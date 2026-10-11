@@ -22,7 +22,7 @@ const record = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 const nullableText = (value: unknown) => value === null || typeof value === 'string';
 const date = (value: unknown) => typeof value === 'string' && Number.isFinite(Date.parse(value));
-function isJob(value: unknown): value is JobItem {
+export function isJob(value: unknown): value is JobItem {
   return (
     record(value) &&
     typeof value.id === 'string' &&
@@ -64,7 +64,7 @@ export function safeExternalUrl(value: string | null): string | null {
   }
 }
 export class JobsError extends Error {
-  constructor(readonly kind: 'connection' | 'backend' | 'query' | 'contract') {
+  constructor(readonly kind: 'connection' | 'backend' | 'query' | 'contract' | 'notfound') {
     super(kind);
   }
 }
