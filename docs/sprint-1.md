@@ -56,7 +56,7 @@ Schemas finais preservados: jobs_d40c856413394663802cee65431e07a9, check_cdff121
 
 ### Publicação
 
-Issues #13/#14/#15 vinculadas ao Milestone Sprint 1. A pipeline foi ampliada com os testes novos; o resultado remoto será registrado após execução no PR. Merge do novo lote depende de autorização específica.
+Issues #13/#14/#15 vinculadas ao Milestone Sprint 1. A pipeline foi ampliada e homologada no [run 38123375563](https://github.com/felipe-rodriguesz/InternRadar/actions/runs/38123375563), HEAD 3e700fa: todos os passos aprovados, 84 testes e encerramento dos serviços do runner. [PR #16](https://github.com/felipe-rodriguesz/InternRadar/pull/16) reúne os commits e os Checks do HEAD mais recente. Merge do novo lote depende de autorização específica.
 
 ## Pendências para Sprint 2
 
