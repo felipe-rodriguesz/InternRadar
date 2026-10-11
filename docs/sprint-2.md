@@ -54,7 +54,7 @@ Schemas novos de testes permanecem preservados: jobs_5121dacf3faf485b96d9badc811
 
 ## Publicação e próximas entregas
 
-A pipeline foi ampliada pelos mesmos scripts, sem chamadas externas obrigatórias. O PR e o resultado da CI serão vinculados após execução remota; publicação de YAML sozinha não comprova homologação.
+O [PR #20](https://github.com/felipe-rodriguesz/InternRadar/pull/20) reúne este lote e relaciona as Issues #17/#18/#19. A pipeline foi homologada no [run 38125980108](https://github.com/felipe-rodriguesz/InternRadar/actions/runs/38125980108), HEAD 7f335451cf52f292110030726deaeabaa63fc5ea: todos os passos e 140 testes aprovados, incluindo integridade da especificação e encerramento dos serviços efêmeros. Os Checks do PR mostram a execução do HEAD mais recente; resultados finais também ficam nas Issues. Não há chamadas externas obrigatórias.
 
 - S2-04: resiliência operacional ampliada, políticas globais entre processos e diagnóstico. Nenhuma fila/Redis/scheduler antecipados.
 - S2-05: revisão final do MVP e benchmark RNF-009 (10.000 vagas/100 consultas), ainda não executado. Licença/hospedagem continuam decisões separadas.

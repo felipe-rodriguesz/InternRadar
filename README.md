@@ -1,23 +1,24 @@
 # InternRadar
 
-Plataforma pessoal para centralizar vagas de estágio em tecnologia de fontes públicas autorizadas. O MVP terá sincronização manual, persistência, filtros e acesso ao anúncio original. Automação, notificações e IA ficam para fases posteriores.
+Plataforma pessoal para centralizar vagas de estágio em tecnologia de fontes públicas autorizadas. O MVP oferece sincronização manual, persistência, filtros e acesso ao anúncio original. Automação, notificações e IA ficam para fases posteriores.
 
 A [especificação oficial v1.0](docs/requirements.md) está preservada. [Decisões complementares](docs/requirements-proposed-changes.md), [arquitetura](docs/architecture.md) e [Sprint 0](docs/sprint-0.md) registram o escopo e as evidências.
 
 ## Estado atual
 
-Sprint 0 e S1-01/S1-02 integradas. O lote S1-03/S1-04/S1-05 implementa sincronização manual Greenhouse, persistência auditável, API paginada e interface `/jobs`. A página inicial leva à pesquisa e mantém a saúde da API. Os anúncios vêm das fontes monitoradas e podem incluir diferentes níveis/localizações; não são classificados automaticamente como estágios.
+Sprint 0 e Sprint 1 integradas. O [PR #20](https://github.com/felipe-rodriguesz/InternRadar/pull/20) entrega S2-01/S2-02/S2-03: sincronização Greenhouse/Ashby/Lever, detalhes de vagas, fontes e histórico, com persistência auditável e API paginada. A página inicial leva à pesquisa e mantém a saúde da API. Os anúncios vêm das fontes monitoradas e podem incluir diferentes níveis/localizações; não são classificados automaticamente como estágios.
 
 ```text
-apps/web/src/app/           Next.js App Router, layout e página inicial
-apps/web/src/components/    Estado da conexão com a API
+apps/web/src/app/           Next.js: início, vagas, detalhes, fontes e histórico
+apps/web/src/components/    Componentes acessíveis de consulta à API
 apps/web/test/              Testes Chromium/Firefox com Playwright
 apps/api/src/config/        Ambiente privado validado
 apps/api/src/health/        Saúde da API e consulta real ao banco
 apps/api/src/database/      Prisma Client, adapter-pg e módulo NestJS
-apps/api/src/connectors/    Contratos, normalização e Greenhouse
+apps/api/src/connectors/    Contratos, normalização e três adapters públicos
 apps/api/src/sync/          CLI, SyncRun e upsert transacional
-apps/api/src/jobs/          Consulta paginada com filtros
+apps/api/src/jobs/          Consulta paginada, filtros e detalhes
+apps/api/src/catalog/       Empresas, fontes e histórico de sincronizações
 apps/api/prisma/            Schema, migrações e seed
 apps/api/test/              Testes HTTP, ambiente e persistência
 compose.yaml               PostgreSQL desenvolvimento/testes separados
