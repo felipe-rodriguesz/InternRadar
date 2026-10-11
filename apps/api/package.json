@@ -19,7 +19,8 @@
     "test:integration": "node --import tsx --test --test-concurrency=1 test/persistence.integration.ts",
     "test:unit": "node --import tsx --test test/environment.test.ts test/normalization.test.ts test/greenhouse.test.ts",
     "test:http": "node --import tsx --test test/health.test.ts",
-    "greenhouse:check": "tsx src/connectors/greenhouse/check-greenhouse.ts"
+    "greenhouse:check": "tsx src/connectors/greenhouse/check-greenhouse.ts",
+    "sync:jobs": "tsx src/sync/sync.cli.ts"
   },
   "dependencies": {
     "@nestjs/common": "12.1.2",
