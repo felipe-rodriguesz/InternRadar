@@ -1,0 +1,5 @@
+{
+  "behavior": "abort-after-deadline",
+  "timeoutMs": 10000,
+  "attempts": 3
+}
