@@ -90,11 +90,11 @@ jobs:
           pnpm db:seed
       - name: API HTTP tests
         run: pnpm --filter @internradar/api test:http
-      - name: Persistence in a separate PostgreSQL cluster
+      - name: Persistence, sync and jobs HTTP in a separate PostgreSQL cluster
         run: pnpm test:integration
       - name: Install Chromium and Firefox with runner dependencies
         run: pnpm --filter @internradar/web exec playwright install --with-deps chromium firefox
-      - name: Browser tests with managed production servers
+      - name: Empty and populated PostgreSQL browser tests with managed servers
         run: pnpm --filter @internradar/web test
       - name: Workspace and tracked-file integrity
         run: |
