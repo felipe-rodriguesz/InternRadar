@@ -46,6 +46,6 @@ pnpm test:integration
 
 No GitHub, abra o check do PR ou use `gh run list --branch <branch>` e `gh run view <id> --log-failed`. Investigue o primeiro passo com erro, corrija e publique um commit normal; não use continue-on-error ou retries globais para esconder falhas. Os testes Playwright têm zero retries.
 
-A configuração não torna checks obrigatórios nem modifica proteção da main. Homologação remota e links das execuções serão registrados na Issue #9 e no PR do lote.
+A configuração não torna checks obrigatórios nem modifica proteção da main. Homologação inicial aprovada no [run 38121178306](https://github.com/felipe-rodriguesz/InternRadar/actions/runs/38121178306): todos os passos concluídos, incluindo 53 testes e finalização dos serviços. O último HEAD deve ter seu próprio check aprovado no [PR #12](https://github.com/felipe-rodriguesz/InternRadar/pull/12); a Issue #9 registra a execução mais recente.
 
 Referências: [services PostgreSQL](https://docs.github.com/en/actions/tutorials/use-containerized-services/create-postgresql-service-containers), [setup-node](https://github.com/actions/setup-node), [pnpm/action-setup](https://github.com/pnpm/action-setup).
