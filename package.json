@@ -12,7 +12,16 @@
     "workspace:list": "pnpm list --recursive --depth -1",
     "format": "prettier --write",
     "format:check": "prettier --check .",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "db:config": "docker compose config --quiet",
+    "db:up": "docker compose up --detach --wait --wait-timeout 90 postgres",
+    "db:stop": "docker compose stop postgres",
+    "db:status": "docker compose --profile test ps",
+    "db:logs": "docker compose logs --tail 100 postgres",
+    "db:test:up": "docker compose --profile test up --detach --wait --wait-timeout 90 postgres-test",
+    "db:test:stop": "docker compose --profile test stop postgres-test",
+    "db:test:logs": "docker compose --profile test logs --tail 100 postgres-test",
+    "db:verify": "node scripts/verify-database.mjs"
   },
   "devDependencies": {
     "@eslint/compat": "2.1.1",
