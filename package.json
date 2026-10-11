@@ -29,7 +29,9 @@
     "prisma:generate": "pnpm --filter @internradar/api prisma:generate",
     "db:migrate": "pnpm --filter @internradar/api db:migrate",
     "db:seed": "pnpm --filter @internradar/api db:seed",
-    "test:integration": "pnpm --filter @internradar/api test:integration"
+    "test:integration": "pnpm --filter @internradar/api test:integration",
+    "greenhouse:check": "pnpm --filter @internradar/api greenhouse:check",
+    "test:unit": "pnpm --filter @internradar/api test:unit"
   },
   "devDependencies": {
     "@eslint/compat": "2.1.1",

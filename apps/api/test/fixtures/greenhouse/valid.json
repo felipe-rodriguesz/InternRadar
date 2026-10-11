@@ -1,0 +1,25 @@
+{
+  "jobs": [
+    {
+      "id": 101,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://boards.greenhouse.io/fixture/jobs/101",
+      "internal_job_id": 999,
+      "content": "&lt;p&gt;Construa &amp; aprenda.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;TypeScript&lt;/li&gt;&lt;/ul&gt;",
+      "location": {
+        "name": "Curitiba, Brasil; São Paulo, Brasil"
+      },
+      "updated_at": "2026-10-10T12:00:00Z",
+      "metadata": [
+        {
+          "name": "Employment Type",
+          "value_type": "text",
+          "value": "Intern"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "total": 1
+  }
+}

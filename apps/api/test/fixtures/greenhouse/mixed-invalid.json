@@ -1,0 +1,37 @@
+{
+  "jobs": [
+    {
+      "id": 101,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://boards.greenhouse.io/fixture/jobs/101"
+    },
+    null,
+    {
+      "title": "Sem ID"
+    },
+    {
+      "id": "101",
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://boards.greenhouse.io/fixture/jobs/101"
+    },
+    {
+      "id": 102,
+      "title": " <script>bad()</script> ",
+      "absolute_url": "https://boards.greenhouse.io/fixture/jobs/101"
+    },
+    {
+      "id": 103,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "javascript:bad()"
+    },
+    {
+      "id": 104,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://boards.greenhouse.io/fixture/jobs/101",
+      "content": 42,
+      "location": {
+        "name": []
+      }
+    }
+  ]
+}

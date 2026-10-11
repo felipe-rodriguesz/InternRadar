@@ -1,0 +1,49 @@
+{
+  "jobs": [
+    {
+      "id": 200,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "javascript:alert(1)"
+    },
+    {
+      "id": 201,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "data:text/html,<script>bad</script>"
+    },
+    {
+      "id": 202,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "file:///etc/passwd"
+    },
+    {
+      "id": 203,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "//example.com/jobs/1"
+    },
+    {
+      "id": 204,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://user:private@example.com/jobs/1"
+    },
+    {
+      "id": 205,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "http://127.0.0.1/jobs/1"
+    },
+    {
+      "id": 206,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://localhost/jobs/1"
+    },
+    {
+      "id": 207,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://example.com:444/jobs/1"
+    },
+    {
+      "id": 208,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://example.com/has space"
+    }
+  ]
+}

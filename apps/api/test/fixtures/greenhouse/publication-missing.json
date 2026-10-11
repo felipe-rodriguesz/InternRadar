@@ -1,0 +1,18 @@
+{
+  "jobs": [
+    {
+      "id": 101,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://boards.greenhouse.io/fixture/jobs/101",
+      "updated_at": "2026-10-10T12:00:00Z",
+      "published_at": "2026-10-01T10:00:00Z",
+      "first_published": "2026-10-01T10:00:00Z",
+      "metadata": [
+        {
+          "name": "Data",
+          "value": "2026-10-01"
+        }
+      ]
+    }
+  ]
+}

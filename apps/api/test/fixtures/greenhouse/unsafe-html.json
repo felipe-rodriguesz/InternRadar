@@ -1,0 +1,10 @@
+{
+  "jobs": [
+    {
+      "id": 101,
+      "title": "Fixture — Estágio em Software",
+      "absolute_url": "https://boards.greenhouse.io/fixture/jobs/101",
+      "content": "<div>Texto seguro<script>alert(1)</script><style>body{display:none}</style><iframe src=\"https://example.com\">oculto</iframe><svg><script>bad()</script><text>oculto</text></svg><img src=x onerror=\"bad()\"><a href=\"javascript:bad()\">Candidatura</a><!-- comentário --></div>"
+    }
+  ]
+}
