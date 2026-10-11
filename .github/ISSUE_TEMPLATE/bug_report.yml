@@ -1,0 +1,22 @@
+name: Relato de problema
+description: Erro reproduzível com evidências sanitizadas.
+title: '[Bug] '
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reprodução e ambiente
+      description: Passos, versões e comandos; nunca copie senhas ou arquivos .env.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Resultado esperado e observado
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências e requisito afetado
+      description: Logs sanitizados, mensagem do erro e IDs relacionados.
