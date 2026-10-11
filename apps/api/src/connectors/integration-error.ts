@@ -10,7 +10,8 @@ export type IntegrationErrorCode =
   | 'NETWORK_ERROR'
   | 'INVALID_JSON'
   | 'UNEXPECTED_RESPONSE'
-  | 'RESPONSE_TOO_LARGE';
+  | 'RESPONSE_TOO_LARGE'
+  | 'PAGINATION_LIMIT';
 
 const transient: IntegrationErrorCode[] = [
   'RATE_LIMITED',

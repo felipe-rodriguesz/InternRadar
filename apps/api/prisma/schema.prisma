@@ -74,6 +74,7 @@ model Job {
   location       String?
   workplaceType  WorkplaceType @default(UNKNOWN)
   employmentType String?
+  isListed       Boolean       @default(true)
   jobUrl         String
   publishedAt    DateTime?     @db.Timestamptz(3)
   firstSeenAt    DateTime      @default(now()) @db.Timestamptz(3)

@@ -56,6 +56,7 @@ export type JobsQuery = ReturnType<typeof parseJobsQuery>;
 const literal = (value: string) => value.replace(/[\\%_]/g, '\\$&');
 export function jobsWhere(query: JobsQuery): Prisma.JobWhereInput {
   return {
+    isListed: true,
     ...(query.q
       ? {
           OR: [

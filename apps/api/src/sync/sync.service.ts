@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { JobConnector } from '../connectors/contracts';
-import { GreenhouseConnector } from '../connectors/greenhouse/greenhouse.connector';
+import { ConnectorRegistry } from '../connectors/connector-registry';
 import { IntegrationError } from '../connectors/integration-error';
 import { PrismaService } from '../database/prisma.service';
 import type { PrismaClient } from '../generated/prisma/client';
@@ -16,7 +15,7 @@ export class SyncError extends Error {
 export class SyncService {
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaClient,
-    @Inject(GreenhouseConnector) private readonly greenhouse: JobConnector,
+    @Inject(ConnectorRegistry) private readonly connectors: ConnectorRegistry,
   ) {}
 
   async synchronize(sourceId: string) {
@@ -28,11 +27,12 @@ export class SyncService {
     let phase = 'COLLECTION';
     let collection: ReturnType<typeof validateCollection> | undefined;
     try {
-      if (source.platform !== this.greenhouse.platform) {
+      const connector = this.connectors.get(source.platform);
+      if (!connector) {
         phase = 'UNSUPPORTED_PLATFORM';
         throw new Error('Unsupported platform');
       }
-      const result = await this.greenhouse.fetchJobs(source);
+      const result = await connector.fetchJobs(source);
       phase = 'INVALID_COLLECTION';
       collection = validateCollection(result);
       const observedAt = new Date();
