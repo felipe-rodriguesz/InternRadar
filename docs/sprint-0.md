@@ -7,7 +7,9 @@
 - Branch S0-01: `chore/s0-01-foundation-tooling`, criada a partir da `main` limpa e sincronizada no commit `83543026f2e99ec25e11e902705ed2d801c4451d`.
 - Issue: [#1 — Configure repository and development tooling](https://github.com/felipe-rodriguesz/InternRadar/issues/1).
 - Milestone: [Sprint 0 — Project Foundation](https://github.com/felipe-rodriguesz/InternRadar/milestone/1).
-- Situação: as quatro subtarefas da S0-01 foram concluídas e aprovadas pelo responsável. Commits, publicação da branch e abertura do PR foram autorizados; merge permanece condicionado a autorização específica.
+- S0-01 integrada por rebase no [PR #2](https://github.com/felipe-rodriguesz/InternRadar/pull/2), em `acaff60f8bb4aacc703fad89886b033807b0588c`; Issue #1 fechada.
+- Lote autorizado S0-02/S0-03: branch `chore/s0-02-03-docs-postgresql`, derivada dessa main após `git pull --ff-only`. Issues [#3](https://github.com/felipe-rodriguesz/InternRadar/issues/3) e [#4](https://github.com/felipe-rodriguesz/InternRadar/issues/4), no mesmo Milestone.
+- Estado do lote: S0-02 finalizada; infraestrutura S0-03 implementada, com homologação bloqueada por entrypoint vazio no PostgreSQL local. Publicação autorizada em Draft PR para revisão; merge não autorizado.
 
 ## Distribuição das validações aprovada
 
@@ -269,9 +271,8 @@ Todas as linhas abaixo estão **pendentes**, sem evidência de execução nesta 
 | S0-05-V03 | S0-05             | Conectar ao PostgreSQL real, aplicar migração em banco vazio e executar consulta pelo Prisma                                                                                   |
 | S0-05-V04 | S0-05             | Executar seed repetido e verificar idempotência, preservação de `enabled` e constraints no banco separado de testes                                                            |
 | S0-06-V01 | S0-06             | Comprovar instalação limpa, checks pertinentes e CI; concluir TA-01/TA-12 no escopo da fundação                                                                                |
-| S0-02-D01 | S0-02             | Formalizar ADRs e revisões da especificação sem alterar retrospectivamente o original incorporado                                                                              |
 
-S0-01d-P01 concluída no escopo compartilhado. A Issue #1 está vinculada ao Milestone acima. A próxima entrega prevista é S0-02; nenhuma tarefa seguinte será iniciada antes da revisão/autorização do responsável.
+S0-01d-P01 concluída no escopo compartilhado. S0-02-D01 concluída no lote atual: ADRs e alterações propostas registrados sem modificar a especificação. As pendências de aplicativos, persistência do produto e CI continuam nas etapas acima.
 
 ## Revisão para publicação da S0-01
 
@@ -289,3 +290,95 @@ AJ-S0-01-01: a publicação introduz `docs/requirements.md whitespace=-blank-at-
 A organização dos commits mantém convenções primeiro, documentação em seguida e workspace/tooling juntos ao final. Assim, a política do documento original antecede sua inclusão, e `package.json`, lockfile e configurações das ferramentas entram no mesmo commit, sem scripts intermediários que referenciem ferramentas ausentes. Cada staging tem seus caminhos conferidos explicitamente antes do commit.
 
 Milestone e Issue S0-01 foram criados após consulta de itens existentes, sem duplicação. Nenhuma outra Issue da sprint, workflow, proteção de branch, release ou tag faz parte desta publicação. O PR deve conter `Closes #1`; a Issue só será concluída pelo vínculo quando a integração for autorizada e realizada.
+
+## S0-02 — Documentação e decisões arquiteturais
+
+Referências: HU-12; RNF-001/002/003/006/016/019; seções 13–15. S0-02 documenta os contratos operacionais utilizados na S0-03; nenhuma aplicação é antecipada.
+
+- [x] ADR-001: pnpm workspaces, monólito modular e frontend/API separados.
+- [x] ADR-002: PostgreSQL, Prisma 7 futuro e instâncias independentes.
+- [x] ADR-003: adapters para APIs públicas; consultas manuais e dados desconhecidos preservados.
+- [x] ADR-006/007: ambientes privados/públicos e GitHub Flow.
+- [x] Arquitetura, CONTRIBUTING, templates de tarefas/bugs e Pull Request.
+- [x] README e operação do banco documentados com comandos reais.
+- [x] Decisões complementares em `requirements-proposed-changes.md`; v1.0 intacta.
+
+ADRs contêm contexto, decisão, justificativa, consequências e alternativas. ADR-004/005 permanecem reservados aos contratos dos conectores e à política de datas/status da especificação. Documentação distingue infraestrutura preparada e verificações ainda bloqueadas. Fontes reais de seed, licença e hospedagem permanecem decisões futuras.
+
+## S0-03 — PostgreSQL local e testes isolados
+
+Referências: RF-001; HU-01/HU-12; RNF-001/006/016. Implementação preparada; **entrega ainda não homologada**. O Engine passou no teste simples após recuperação, mas PostgreSQL falhou antes de executar SQL; evidências atuais constam na seção de recuperação abaixo.
+
+- `compose.yaml`: PostgreSQL `17.11-bookworm`, fixado pelo digest OCI `sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826`.
+- Serviços `postgres` e `postgres-test` (profile `test`), com redes e volumes próprios.
+- Portas configuráveis publicadas somente em `127.0.0.1`, padrões 5432/5433.
+- Variáveis obrigatórias, SCRAM para TCP, healthcheck `pg_isready` e logs com rotação (10 MB × 3).
+- `.env.example` com placeholders; `.env` local ignorado e privado, sem credenciais incluídas na entrega.
+- Scripts `db:config`, `db:up`, `db:stop`, `db:status`, `db:logs`, `db:test:up`, `db:test:stop`, `db:test:logs` e `db:verify`.
+- Verificador Node sem dependências adicionais: cria projeto único, portas disponíveis, credenciais aleatórias, testa configuração, saúde, TCP/SQL/autenticação, persistência e isolamento. Para somente seus containers e preserva volumes; não utiliza o projeto diário.
+- Nenhum schema Prisma, migração ou seed do produto. A tabela SQL de prova será criada somente nos bancos novos do verificador.
+
+### Evidências da retomada em 11/10/2026
+
+| Comando/verificação                                       | Resultado observado                                                                                                                                          |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Git, Issues e PRs                                         | Branch correta; main/origin/main/HEAD em `acaff60`; PR #2 MERGED; Issues #3/#4 existentes, sem duplicação                                                    |
+| `docker version`, `docker compose version`, `docker info` | Inicialmente responderam CLI/Engine 29.8.2, Compose 5.5.1, Docker Desktop                                                                                    |
+| `docker ps -a`, `docker volume ls`, `docker network ls`   | Nenhum container/volume anterior; apenas redes padrão bridge/host/none                                                                                       |
+| Pull da imagem fixada                                     | Download concluído; digest corresponde ao Compose                                                                                                            |
+| `pnpm db:config`                                          | Configuração resolvida sem imprimir credenciais                                                                                                              |
+| `pnpm db:verify`                                          | Configuração válida e rejeição de senha vazia/porta inválida passaram; inicialização falhou com HTTP 502 em containers/create                                |
+| Diagnóstico após falha                                    | CLI Linux SIGBUS; kernel registra I/O error em loop0; socket /_ping não responde; CLI Windows excede timeout                                                 |
+| Instalação congelada com peers estritos                   | Passou; lockfile inalterado                                                                                                                                  |
+| Lint e workspaces                                         | Passaram; raiz/web/api reconhecidos, filtros selecionam os diretórios corretos                                                                               |
+| YAML, ADRs, links locais e LF                             | Sintaxe, seções obrigatórias, caminhos e finais de linha validados                                                                                           |
+| Ignores e integridade                                     | `.env` ignorado; Compose, lockfile e migrações elegíveis; especificação idêntica ao original por bytes e SHA-256; tsconfigs/workspace/lockfile iguais à main |
+
+A falha ocorreu após criar as redes e os volumes `internradar-check-0c06fac7328e_postgres_data` e `internradar-check-0c06fac7328e_postgres_test_data`. Todos permanecem preservados; nenhum comando de remoção de volumes foi executado. Não foi possível concluir a inspeção do daemon após a falha nem confirmar containers eventualmente criados. Os testes não se conectaram ao banco e não executaram a tabela de prova. A falha ao parar o projeto também retorna status de erro; não é ocultada pelo script.
+
+### Pendências específicas
+
+| ID        | Resultado necessário                                                                                 | Estado                                 |
+| --------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| S0-03-V01 | Inicializar dois serviços e confirmar saúde, TCP no host e SQL autenticado                           | Bloqueado: entrypoint PostgreSQL vazio |
+| S0-03-V02 | Confirmar dados após restart/recriação de containers próprios e isolamento de clusters/redes/volumes | Não executado; depende de V01          |
+| S0-03-V03 | Rejeitar senha SQL incorreta e inspecionar estado final do projeto de teste                          | Não executado; depende de V01          |
+| S0-03-P01 | Publicar o progresso em Draft PR com limitações e preservar main/volumes                             | Autorizado; publicação neste lote      |
+
+S0-04: aplicativos, ambiente privado carregado explicitamente, saúde/comunicação e typecheck/build. S0-05: Prisma major 7, geração/build/runtime, entidades, migrações e seed idempotente no banco separado de testes. S0-06: CI dos comandos reais. Nenhuma dessas validações foi declarada executada neste lote.
+
+Revisão estática final da retomada: `pnpm format:check`, `pnpm lint`, `node --check scripts/verify-database.mjs` e `git diff --check` aprovados; whitespace dos arquivos não rastreados também validado. API TypeScript confirmou herança strict dos três tsconfigs, sem fontes ou typecheck de aplicativos. Foram revisados 34 arquivos versionáveis; nenhuma senha do ambiente local ou padrão de token/chave privada foi encontrado. O `.env` permanece ignorado, com modo 0600. Nenhum commit, push ou PR do lote foi realizado enquanto a homologação do PostgreSQL está bloqueada.
+
+### Nova tentativa após liberação de espaço no C: — 11/10/2026, 04:58 UTC
+
+A tentativa inicial falhou antes de acessar o Engine: `timeout: failed to run command ‘docker’: Input/output error` (status 126). `/usr/bin/docker` aponta para `/mnt/wsl/docker-desktop/cli-tools/usr/bin/docker`; o socket existe, mas não foi testado novamente após identificar I/O, conforme orientação do responsável. O kernel registrou novos erros de leitura em `loop0`.
+
+`df -h /mnt/c` informa 4,6 GB disponíveis em 238 GB, ocupação 99%. A causa exata não foi confirmada; liberar espaço não restabeleceu o executável nesta sessão. Testes Docker interrompidos, sem executar `pnpm db:verify` nesta tentativa e sem inspecionar ou modificar recursos pelo daemon. Estado atual dos containers/volumes permanece não confirmado. Nenhuma remoção, restart ou recriação executada.
+
+Branch e alterações anteriores preservadas; main/HEAD/origin/main em `acaff60`. SHA-256 da especificação e do lockfile preservados; `git diff --check` aprovado. Commits, push e PR continuam pendentes da homologação real.
+
+### Recuperação do Engine e homologação controlada — 11/10/2026
+
+Os clientes Windows e Ubuntu retornaram o mesmo ID `6400e8db-a5da-49fc-8e50-02d142a8749f`, Engine 29.8.2 e Docker Desktop; Compose 5.5.1. `df` registrou cerca de 17 GiB livres no C: (a diferença para GB decimais explica aproximadamente 18,68 GB informados pelo responsável). O backup do VHDX foi informado pelo responsável; sua cópia não foi criada nem revalidada pelo agente.
+
+Inspeção inicial: nenhum container/volume registrado. Imagens hello-world e PostgreSQL com o digest fixado presentes. Permaneceram as redes `internradar-check-0c06fac7328e_development` e `internradar-check-0c06fac7328e_testing`; não foram removidas. A ausência dos volumes anteriormente criados descreve o estado registrado no Engine, sem inferir como ocorreu sua recuperação.
+
+| Verificação atual                                     | Evidência                                                                                                          |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `docker run --rm hello-world`                         | Executou e encerrou com status 0; container efêmero sem volume                                                     |
+| Comparação do kernel com baseline anterior ao teste   | Nenhum novo erro de I/O/SIGBUS/crash no intervalo observado; erros antigos permanecem no histórico                 |
+| Revisão do verificador                                | Projeto aleatório próprio, portas/credenciais próprias, sem remoção de volumes ou operações sobre o projeto diário |
+| `pnpm db:config`                                      | Aprovado                                                                                                           |
+| `pnpm db:verify`                                      | Configuração válida e erros de variáveis/porta passaram; containers criados/iniciados, mas ficaram unhealthy       |
+| Logs dos dois containers                              | `exec /usr/local/bin/docker-entrypoint.sh: exec format error`                                                      |
+| Plataforma                                            | Engine linux/x86_64; imagem linux/amd64, sem divergência de arquitetura identificada                               |
+| `docker cp` do entrypoint do container próprio parado | Leitura bem-sucedida; arquivo vazio, 0 bytes                                                                       |
+| Pull explícito do mesmo digest para linux/amd64       | Status “Image is up to date”; cache existente reutilizado, sem novo download de camadas                            |
+| Saúde/SQL/persistência/isolamento real                | Não aprovados: PostgreSQL não inicializou; tabela de prova não executada                                           |
+| Instalação congelada, lint, formatação e workspaces   | Aprovados; dependências e lockfile preservados                                                                     |
+
+O entrypoint vazio é evidência de inconsistência no conteúdo local da imagem/container; corrupção decorrente dos incidentes anteriores é uma hipótese, não uma causa comprovada. Não foi alterada a imagem fixada, aplicado override de entrypoint, apagado cache ou removido recurso para contornar a falha. Não houve repetição da suíte depois desse diagnóstico.
+
+O verificador parou os containers próprios `internradar-check-e3dcaedf6932-postgres-1` e `internradar-check-e3dcaedf6932-postgres-test-1`. Volumes `internradar-check-e3dcaedf6932_postgres_data` e `internradar-check-e3dcaedf6932_postgres_test_data`, redes e containers permanecem preservados. Nenhum volume anterior foi utilizado, apagado ou reinicializado.
+
+Conforme autorização do responsável, o progresso tem publicação autorizada em **Draft Pull Request**, com as Issues #3/#4 abertas. S0-02 está documentada; S0-03 continua pendente das verificações V01/V02/V03. Restaurar uma imagem PostgreSQL executável sem perder os dados preservados exige intervenção no ambiente; após isso, repetir `pnpm db:verify`, atualizar evidências e tornar o PR pronto para revisão. Merge segue condicionado a autorização específica.

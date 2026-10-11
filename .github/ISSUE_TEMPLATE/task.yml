@@ -1,0 +1,32 @@
+name: Tarefa de desenvolvimento
+description: Entrega com escopo, rastreabilidade e critérios verificáveis.
+title: '[Sx-xx] '
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objetivo e escopo
+      description: Informe resultado esperado, limites e dependências.
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requisitos e referências
+      description: IDs RF/HU/RNF, seção da especificação e ADRs relacionados.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critérios de aceitação e subtarefas
+      description: Use checklist com resultados observáveis.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validação prevista
+      description: Comandos/testes pertinentes e pendências deliberadas. Não inclua segredos.
+    validations:
+      required: true
