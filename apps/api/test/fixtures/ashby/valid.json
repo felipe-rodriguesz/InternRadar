@@ -1,0 +1,16 @@
+{
+  "jobs": [
+    {
+      "title": "Fixture Engineering Intern",
+      "jobUrl": "https://jobs.ashbyhq.com/fixture/job-A",
+      "descriptionPlain": "Aprenda com segurança.",
+      "descriptionHtml": "<p>Não deve prevalecer</p>",
+      "location": "Curitiba",
+      "workplaceType": "Remote",
+      "isRemote": true,
+      "employmentType": "Intern",
+      "publishedAt": "2026-10-01T12:30:00Z",
+      "isListed": true
+    }
+  ]
+}

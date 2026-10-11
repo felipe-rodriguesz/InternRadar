@@ -21,3 +21,9 @@ Ashby: os endpoints públicos de `notion` e `ashby` retornaram HTTP 403 neste am
 `seed-data.ts` contém UUIDs internos estáveis das empresas. `seed-core.ts` executa uma transação e busca fontes pela identidade global `(platform, boardKey, region)`. Se a fonte já existir, usa sua empresa atual e não a reassocia; `update: {}` preserva `enabled`, inclusive `false`. Os nomes/URLs das empresas do seed são atualizados para os valores declarados, sem criar novas linhas a cada execução.
 
 Testes reais confirmam quantidade de empresas/fontes, estabilidade dos IDs e preservação da fonte desativada. Fixtures de vagas/empresas usadas para testar constraints ficam somente no schema isolado de testes e não pertencem ao seed de desenvolvimento.
+
+## S2-01 — Ashby verificado
+
+Em 11/10/2026 às 08:23:48 UTC, o board `Ashby` indicado na [documentação oficial](https://developers.ashbyhq.com/docs/public-job-posting-api) respondeu HTTP 200 em `https://api.ashbyhq.com/posting-api/job-board/Ashby`, com 68 anúncios e isListed=true nessa amostra. Empresa Ashby, website https://www.ashbyhq.com, plataforma ASHBY, região GLOBAL. O seed agora inclui essa terceira fonte, preservando as fontes existentes e enabled=false. UUID interno estável da empresa não representa ID da plataforma.
+
+A pendência S0-05-P01 está resolvida para esse board. Notion e o identificador anterior em minúsculas não foram homologados nem adicionados ao seed. A causa histórica dos 403 não foi comprovada; nenhuma restrição foi contornada. Resultados de persistência constam em [sprint-2.md](sprint-2.md).

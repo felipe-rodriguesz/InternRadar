@@ -66,3 +66,7 @@ Issues #13/#14/#15 vinculadas ao Milestone Sprint 1. A pipeline foi ampliada e h
 - S2-04: resiliência operacional ampliada e concorrência entre processos; sem Redis/agendamento antecipados.
 - S2-05: homologação restante do MVP e benchmark RNF-009 (10 mil registros/100 consultas), ainda não executado.
 - Nenhuma transição por ausência, favoritos, ranking, autenticação ou deploy público foi implementada.
+
+## Integração encerrada
+
+PR #16 integrado por rebase em 11/10/2026 às 08:15:09 UTC, após conferir HEAD 38cb7feaa82d6a4c0e731a514861c108699ffa52 e CI 38123546105 aprovada. Main local/remota sincronizada em 1808b8617b809f3b1dc6f89ceae276019df44586. Issues #13/#14/#15 fechadas automaticamente; branches e recursos preservados. Evolução: [Sprint 2](sprint-2.md).

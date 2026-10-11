@@ -11,6 +11,7 @@ const jobSchema = z.object({
   employmentType: z.string().max(200).nullable(),
   jobUrl: z.string().refine((value) => validJobUrl(value) !== null),
   publishedAt: z.date().nullable(),
+  isListed: z.boolean().default(true),
 });
 const count = z.number().int().min(0).max(10000);
 const envelope = z.object({
@@ -19,7 +20,13 @@ const envelope = z.object({
     .array(
       z.object({
         index: count,
-        code: z.enum(['INVALID_ITEM', 'INVALID_ID', 'EMPTY_TITLE', 'INVALID_JOB_URL']),
+        code: z.enum([
+          'INVALID_ITEM',
+          'INVALID_ID',
+          'EMPTY_TITLE',
+          'INVALID_JOB_URL',
+          'DUPLICATE_EXTERNAL_ID',
+        ]),
       }),
     )
     .max(10000),
@@ -29,7 +36,7 @@ const envelope = z.object({
   receivedCount: count,
   acceptedCount: count,
   rejectedCount: count,
-  attempts: z.number().int().min(1).max(3),
+  attempts: z.number().int().min(1).max(300),
 });
 
 /** Checks the normalized boundary; never interprets a platform payload here. */

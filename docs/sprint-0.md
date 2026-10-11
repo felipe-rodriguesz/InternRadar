@@ -447,7 +447,7 @@ Ambos os containers diários permaneceram healthy. Cerca de 15 GiB livres no C: 
 - [x] Migração versionada, consultas/gravações reais, constraints e seed idempotente.
 - [x] Testes de persistência isolados, enabled=false preservado e recursos antigos mantidos.
 - [x] Especificação v1.0 preservada; decisões novas em ADR-008 e alterações complementares.
-- [ ] S0-05-P01: verificar um board Ashby antes de S2-01. Endpoints consultados retornaram 403; nenhum identificador Ashby foi incluído no seed sem evidência.
+- [x] S0-05-P01: resolvida na S2-01. Board oficial `Ashby` respondeu HTTP 200 em 11/10/2026; 68 anúncios sincronizados. Os 403 anteriores permanecem como evidência histórica, sem contorno de restrições. [Sprint 2](sprint-2.md).
 - [x] S0-06-V01: banco/browsers provisionados e comandos reais aprovados no runner limpo; TA-01/TA-12 no escopo da fundação homologados no lote seguinte.
 - [ ] S0-06-P01: acompanhar suporte dos plugins à major seguinte do ESLint; major 9 permanece compatível e fixada.
 

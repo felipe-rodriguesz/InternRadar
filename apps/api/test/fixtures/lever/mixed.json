@@ -1,0 +1,98 @@
+[
+  {
+    "id": "fixture-lever-A",
+    "text": "Fixture Developer",
+    "hostedUrl": "https://jobs.lever.co/fixture/fixture-lever-A",
+    "categories": {
+      "location": "Lisboa",
+      "commitment": "Full-time"
+    },
+    "workplaceType": "hybrid",
+    "descriptionPlain": "Descrição de fixture",
+    "lists": [
+      {
+        "text": "Requisitos",
+        "content": "<li>TypeScript</li><script>danger()</script>"
+      }
+    ],
+    "additional": "<p>Fim</p>",
+    "createdAt": 1770000000000
+  },
+  {
+    "id": "fixture-lever-A",
+    "text": "Fixture Developer",
+    "hostedUrl": "https://jobs.lever.co/fixture/fixture-lever-A",
+    "categories": {
+      "location": "Lisboa",
+      "commitment": "Full-time"
+    },
+    "workplaceType": "hybrid",
+    "descriptionPlain": "Descrição de fixture",
+    "lists": [
+      {
+        "text": "Requisitos",
+        "content": "<li>TypeScript</li><script>danger()</script>"
+      }
+    ],
+    "additional": "<p>Fim</p>",
+    "createdAt": 1770000000000
+  },
+  null,
+  {
+    "id": "bad / id",
+    "text": "Fixture Developer",
+    "hostedUrl": "https://jobs.lever.co/fixture/fixture-lever-A",
+    "categories": {
+      "location": "Lisboa",
+      "commitment": "Full-time"
+    },
+    "workplaceType": "hybrid",
+    "descriptionPlain": "Descrição de fixture",
+    "lists": [
+      {
+        "text": "Requisitos",
+        "content": "<li>TypeScript</li><script>danger()</script>"
+      }
+    ],
+    "additional": "<p>Fim</p>",
+    "createdAt": 1770000000000
+  },
+  {
+    "id": "fixture-unsafe",
+    "text": "Fixture Developer",
+    "hostedUrl": "file:///etc/passwd",
+    "categories": {
+      "location": "Lisboa",
+      "commitment": "Full-time"
+    },
+    "workplaceType": "hybrid",
+    "descriptionPlain": "Descrição de fixture",
+    "lists": [
+      {
+        "text": "Requisitos",
+        "content": "<li>TypeScript</li><script>danger()</script>"
+      }
+    ],
+    "additional": "<p>Fim</p>",
+    "createdAt": 1770000000000
+  },
+  {
+    "id": "fixture-empty",
+    "text": " ",
+    "hostedUrl": "https://jobs.lever.co/fixture/fixture-lever-A",
+    "categories": {
+      "location": "Lisboa",
+      "commitment": "Full-time"
+    },
+    "workplaceType": "hybrid",
+    "descriptionPlain": "Descrição de fixture",
+    "lists": [
+      {
+        "text": "Requisitos",
+        "content": "<li>TypeScript</li><script>danger()</script>"
+      }
+    ],
+    "additional": "<p>Fim</p>",
+    "createdAt": 1770000000000
+  }
+]

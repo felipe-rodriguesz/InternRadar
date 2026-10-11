@@ -102,3 +102,11 @@ Todos os recursos das recuperações anteriores continuam preservados. Não foi 
 S1-03 utiliza as tabelas/constraints existentes, sem nova migração nem mudança de digest. Persistência usa upsert e lock da linha da fonte somente durante a transação; gravação das vagas e SUCCESS são atômicos. [ADR-005](decisions/ADR-005-politica-de-datas-e-status.md) descreve o tratamento de rollback/RUNNING.
 
 `test:integration` executa a suíte original em schema check_<uuid> e sincronização/HTTP em jobs_<uuid>. O runner de browsers cria browser_<uuid>, primeiro vazio e depois alimentado por fixtures identificadas. Guardas comparam porta, banco e system_identifier antes de qualquer escrita; contagens do banco diário são verificadas no final. Schemas permanecem disponíveis, inclusive triggers que simulam falhas exclusivamente no schema de testes. Não há DROP, reset ou limpeza de recursos antigos.
+
+## S2-01 — Visibilidade explícita
+
+Migração `20261011083000_job_visibility`: somente ADD COLUMN Job.isListed boolean NOT NULL DEFAULT true. Aplica-se com `pnpm db:migrate`; não há reset, exclusão, alteração dos IDs ou de firstSeenAt. Foi testada em bancos vazios no cluster separado e aplicada sobre as 150 vagas reais da Figma, cuja identidade/datas foram conferidas após a coleta. O índice/trigger de imutabilidade e as constraints anteriores permanecem.
+
+O seed inclui três boards verificados, preservando enabled existente. Ashby false explícito atualiza visibilidade; JobsService oculta a vaga da busca, sem apagá-la nem inferir encerramento. Detalhes mostram a condição. Veja [ADR-009](decisions/ADR-009-visibilidade-e-consultas.md).
+
+Não apagar schemas criados pelos testes para “limpar” resultados; continuam preservados. As verificações de integração comparam as contagens do banco diário antes/depois e recusam usar o mesmo cluster. A demonstração real é uma operação separada, executada somente após a suíte liberar essas verificações.

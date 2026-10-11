@@ -17,4 +17,12 @@ export const seedSources = [
     boardKey: 'spotify',
     region: 'GLOBAL',
   },
+  {
+    companyId: 'a64c4ca0-fbbf-4bd8-932e-6572375138af',
+    name: 'Ashby',
+    websiteUrl: 'https://www.ashbyhq.com',
+    platform: 'ASHBY',
+    boardKey: 'Ashby',
+    region: 'GLOBAL',
+  },
 ] as const;

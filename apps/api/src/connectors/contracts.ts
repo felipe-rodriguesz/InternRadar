@@ -19,9 +19,12 @@ export interface NormalizedJob {
   employmentType: string | null;
   jobUrl: string;
   publishedAt: Date | null;
+  /** Explicit source visibility. Missing means listed for existing adapters. */
+  isListed?: boolean;
 }
 
-export type RejectionCode = 'INVALID_ITEM' | 'INVALID_ID' | 'EMPTY_TITLE' | 'INVALID_JOB_URL';
+export type RejectionCode =
+  'INVALID_ITEM' | 'INVALID_ID' | 'EMPTY_TITLE' | 'INVALID_JOB_URL' | 'DUPLICATE_EXTERNAL_ID';
 export interface RejectedItem {
   index: number;
   externalId: string | null;

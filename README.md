@@ -1,23 +1,24 @@
 # InternRadar
 
-Plataforma pessoal para centralizar vagas de estágio em tecnologia de fontes públicas autorizadas. O MVP terá sincronização manual, persistência, filtros e acesso ao anúncio original. Automação, notificações e IA ficam para fases posteriores.
+Plataforma pessoal para centralizar vagas de estágio em tecnologia de fontes públicas autorizadas. O MVP oferece sincronização manual, persistência, filtros e acesso ao anúncio original. Automação, notificações e IA ficam para fases posteriores.
 
 A [especificação oficial v1.0](docs/requirements.md) está preservada. [Decisões complementares](docs/requirements-proposed-changes.md), [arquitetura](docs/architecture.md) e [Sprint 0](docs/sprint-0.md) registram o escopo e as evidências.
 
 ## Estado atual
 
-Sprint 0 e S1-01/S1-02 integradas. O lote S1-03/S1-04/S1-05 implementa sincronização manual Greenhouse, persistência auditável, API paginada e interface `/jobs`. A página inicial leva à pesquisa e mantém a saúde da API. Os anúncios vêm das fontes monitoradas e podem incluir diferentes níveis/localizações; não são classificados automaticamente como estágios.
+Sprint 0 e Sprint 1 integradas. O [PR #20](https://github.com/felipe-rodriguesz/InternRadar/pull/20) entrega S2-01/S2-02/S2-03: sincronização Greenhouse/Ashby/Lever, detalhes de vagas, fontes e histórico, com persistência auditável e API paginada. A página inicial leva à pesquisa e mantém a saúde da API. Os anúncios vêm das fontes monitoradas e podem incluir diferentes níveis/localizações; não são classificados automaticamente como estágios.
 
 ```text
-apps/web/src/app/           Next.js App Router, layout e página inicial
-apps/web/src/components/    Estado da conexão com a API
+apps/web/src/app/           Next.js: início, vagas, detalhes, fontes e histórico
+apps/web/src/components/    Componentes acessíveis de consulta à API
 apps/web/test/              Testes Chromium/Firefox com Playwright
 apps/api/src/config/        Ambiente privado validado
 apps/api/src/health/        Saúde da API e consulta real ao banco
 apps/api/src/database/      Prisma Client, adapter-pg e módulo NestJS
-apps/api/src/connectors/    Contratos, normalização e Greenhouse
+apps/api/src/connectors/    Contratos, normalização e três adapters públicos
 apps/api/src/sync/          CLI, SyncRun e upsert transacional
-apps/api/src/jobs/          Consulta paginada com filtros
+apps/api/src/jobs/          Consulta paginada, filtros e detalhes
+apps/api/src/catalog/       Empresas, fontes e histórico de sincronizações
 apps/api/prisma/            Schema, migrações e seed
 apps/api/test/              Testes HTTP, ambiente e persistência
 compose.yaml               PostgreSQL desenvolvimento/testes separados
@@ -76,7 +77,7 @@ pnpm db:status
 
 A saúde retorna `{"status":"ok","service":"internradar-api","database":{"status":"connected"}}` **somente após `SELECT 1` executado pelo Prisma**. Falha no banco retorna 503 sanitizado; `/health` redireciona com 307 para a rota canônica. Isso verifica a conexão, não substitui a checagem de migrações/seed. A interface diferencia banco indisponível de falha de conexão com a API.
 
-O seed cadastra **Figma/Greenhouse e Spotify/Lever**, com boards verificados. Reexecuções preservam IDs e `enabled=false`; nenhuma vaga é coletada. A verificação Ashby ficou pendente por HTTP 403. [Fontes e evidências](docs/seed-sources.md).
+O seed cadastra **Figma/Greenhouse, Ashby/Ashby e Spotify/Lever**, com boards verificados. Reexecuções preservam IDs e `enabled=false`; nenhuma vaga é coletada pelo seed. O board oficial Ashby foi homologado na S2-01. [Fontes e evidências](docs/seed-sources.md).
 
 ## Qualidade e testes
 
@@ -114,7 +115,7 @@ O primeiro comando testa contratos, normalização e falhas sem internet ou banc
 
 `pnpm sync:jobs --source UUID` sincroniza uma fonte; sem `--source`, todas as habilitadas. `--concurrency 1` reduz o máximo padrão de duas por processo. Cada tentativa gera SyncRun; reexecuções atualizam anúncios sem duplicar ou alterar firstSeenAt. Falhas não apagam vagas. Nenhum endpoint administrativo é exposto.
 
-Somente Greenhouse está implementado: a fonte Spotify/Lever do seed produz FAILED/UNSUPPORTED_PLATFORM no comando global, que continua as demais e retorna exit code 1. Para a primeira demonstração use Figma. Detalhes de contadores, falhas, RUNNING incompleto, filtros e datas: [sincronização e API](docs/synchronization.md).
+Os três conectores estão implementados. O comando global seleciona o adapter por plataforma; uma falha permanece isolada à fonte e faz o CLI retornar exit code 1 sem ocultar os demais resultados. Detalhes de contadores, falhas, RUNNING incompleto, filtros e datas: [sincronização e API](docs/synchronization.md).
 
 Fluxo: **Greenhouse → Connector → SyncService → Prisma → PostgreSQL → GET /jobs → Next.js**. O navegador consulta exclusivamente a API InternRadar; sincronização acontece somente pelo CLI. A saúde executa SELECT 1; as vagas são lidas da base, sem consultar a origem durante a navegação.
 
@@ -125,3 +126,26 @@ Fluxo: **Greenhouse → Connector → SyncService → Prisma → PostgreSQL → 
 Sprint 2: Ashby/Lever, detalhes de vaga, fontes/histórico e resiliência ampliada. Nenhum desses incrementos foi antecipado. Deploy público, autenticação, licença e automações permanecem fora deste lote; mantenha a aplicação local.
 
 Os testes de navegador usam a URL pública padrão `http://127.0.0.1:3001/api/v1` incorporada ao build. Se alterá-la para desenvolvimento, refaça o build com esse valor antes de executar a suíte. Os servidores de teste recusam portas já ocupadas.
+
+## Sprint 2 — múltiplas fontes e acompanhamento
+
+Agora: Greenhouse, Ashby e Lever; detalhes da vaga; fontes e histórico de sincronizações. A coleta é manual por CLI. No navegador, as páginas leem exclusivamente a API InternRadar e os dados persistidos.
+
+```sh
+pnpm install --frozen-lockfile --strict-peer-dependencies
+pnpm db:up
+pnpm prisma:generate
+pnpm db:migrate
+pnpm db:seed
+pnpm sync:jobs --list
+pnpm sync:jobs --concurrency 1
+pnpm dev
+```
+
+Execute os comandos de banco somente após conferir o destino privado do seu `.env`, conforme [banco](docs/database.md); preserve o projeto/volumes Trixie já configurados. O seed não duplica fontes nem reativa fontes desabilitadas. Para coletar apenas uma fonte, `pnpm sync:jobs --source UUID`.
+
+Abra [início](http://localhost:3000), [vagas](http://localhost:3000/jobs), [fontes](http://localhost:3000/sources) e [histórico](http://localhost:3000/sync-runs). Clique no título para detalhes internos; a candidatura continua no anúncio original. A presença de uma vaga não comprova disponibilidade de candidatura, estágio ou localização brasileira.
+
+Checks: `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm build`, `pnpm test:unit`, `pnpm --filter @internradar/api test:http`, `pnpm test:integration` e `pnpm --filter @internradar/web test`. Antes dos testes com banco, inicie o profile test conforme [database.md](docs/database.md). Browsers precisam das portas 3001/3100 livres e builds prontos. Fixtures ficam em schemas novos no cluster separado; não alteram as vagas diárias.
+
+[Entrega e evidências Sprint 2](docs/sprint-2.md) · [Contratos HTTP](docs/synchronization.md) · [Conectores](docs/connectors.md).

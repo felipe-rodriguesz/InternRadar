@@ -28,3 +28,5 @@ Resultado detalhado diferencia vazio válido, rejeição parcial e falha integra
 ## Alternativas consideradas
 
 Retornar somente array perderia motivos e contagens. Acoplar ao Prisma dificultaria testes offline e misturaria consulta com persistência. Um framework genérico de coletores/paginação seria prematuro para uma API. Regex para HTML não é um parser seguro; DOM completo adicionaria execução/capacidades desnecessárias.
+
+S2-01: GreenhouseHttp delega ao PublicJobsHttp compartilhado. ConnectorRegistry seleciona Greenhouse/Ashby/Lever por plataforma. Lever limita 100 páginas e soma tentativas; normalização permanece por adapter. Visibilidade opcional isListed e consultas estão no [ADR-009](ADR-009-visibilidade-e-consultas.md).

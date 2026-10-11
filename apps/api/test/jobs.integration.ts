@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { INestApplication } from '@nestjs/common';
 import { isolatedDatabase } from './helpers/isolated-database';
+import { ConnectorRegistry } from '../src/connectors/connector-registry';
 import { SyncService } from '../src/sync/sync.service';
 import { createApplication } from '../src/application';
 import { IntegrationError } from '../src/connectors/integration-error';
@@ -63,7 +64,7 @@ before(async () => {
       data: { companyId, platform: 'GREENHOUSE', boardKey: 'fixture-s1' },
     })
   ).id;
-  sync = new SyncService(db.prisma, connector);
+  sync = new SyncService(db.prisma, new ConnectorRegistry([connector]));
   result = collection([job]);
   collect = () => Promise.resolve(result);
 });

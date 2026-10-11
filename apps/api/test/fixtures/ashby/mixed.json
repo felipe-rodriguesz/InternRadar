@@ -1,0 +1,77 @@
+{
+  "jobs": [
+    {
+      "title": "Fixture Engineering Intern",
+      "jobUrl": "https://jobs.ashbyhq.com/fixture/job-A",
+      "descriptionPlain": "Aprenda com segurança.",
+      "descriptionHtml": "<p>Não deve prevalecer</p>",
+      "location": "Curitiba",
+      "workplaceType": "Remote",
+      "isRemote": true,
+      "employmentType": "Intern",
+      "publishedAt": "2026-10-01T12:30:00Z",
+      "isListed": true
+    },
+    {
+      "title": "Fixture Engineering Intern",
+      "jobUrl": "https://jobs.ashbyhq.com/fixture/job-A/?utm_source=x#apply",
+      "descriptionPlain": "Aprenda com segurança.",
+      "descriptionHtml": "<p>Não deve prevalecer</p>",
+      "location": "Curitiba",
+      "workplaceType": "Remote",
+      "isRemote": true,
+      "employmentType": "Intern",
+      "publishedAt": "2026-10-01T12:30:00Z",
+      "isListed": true
+    },
+    {
+      "title": "Fixture Engineering Intern",
+      "jobUrl": "javascript:alert(1)",
+      "descriptionPlain": "Aprenda com segurança.",
+      "descriptionHtml": "<p>Não deve prevalecer</p>",
+      "location": "Curitiba",
+      "workplaceType": "Remote",
+      "isRemote": true,
+      "employmentType": "Intern",
+      "publishedAt": "2026-10-01T12:30:00Z",
+      "isListed": true
+    },
+    null,
+    {
+      "title": "  ",
+      "jobUrl": "https://jobs.ashbyhq.com/fixture/job-A",
+      "descriptionPlain": "Aprenda com segurança.",
+      "descriptionHtml": "<p>Não deve prevalecer</p>",
+      "location": "Curitiba",
+      "workplaceType": "Remote",
+      "isRemote": true,
+      "employmentType": "Intern",
+      "publishedAt": "2026-10-01T12:30:00Z",
+      "isListed": true
+    },
+    {
+      "title": "Fixture Engineering Intern",
+      "jobUrl": "https://jobs.ashbyhq.com/fixture/job-B",
+      "descriptionPlain": "Aprenda com segurança.",
+      "descriptionHtml": "<p>Não deve prevalecer</p>",
+      "location": "Curitiba",
+      "workplaceType": "Remote",
+      "isRemote": true,
+      "employmentType": "Intern",
+      "publishedAt": "2026-10-01T12:30:00Z",
+      "isListed": false
+    },
+    {
+      "title": "Fixture Engineering Intern",
+      "jobUrl": "https://jobs.ashbyhq.com/fixture/job-C",
+      "descriptionPlain": null,
+      "descriptionHtml": "<p>Texto</p><script>alert(1)</script><img src=x onerror=evil()>",
+      "location": "Curitiba",
+      "workplaceType": "ambiguous",
+      "isRemote": false,
+      "employmentType": "Intern",
+      "publishedAt": "bad",
+      "isListed": true
+    }
+  ]
+}

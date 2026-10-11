@@ -15,7 +15,7 @@ pnpm sync:jobs --concurrency 1
 
 `--list` mostra somente IDs, empresa, plataforma, board e enabled. `--source` exige UUID; fonte inexistente falha e desativada retorna SKIPPED sem iniciar SyncRun. Sem source, seleciona todas as habilitadas, no máximo duas em paralelo por processo. `--concurrency 1` reduz o limite; argumentos inválidos não iniciam a coleta.
 
-O seed contém Figma/Greenhouse e Spotify/Lever. **Neste lote somente Greenhouse é implementado.** A execução global registra FAILED/UNSUPPORTED_PLATFORM para Lever, continua as outras fontes e retorna exit code 1. Não desativamos silenciosamente a fonte nem simulamos seu sucesso. Para a demonstração, use o UUID Greenhouse retornado por `--list`.
+O seed contém Figma/Greenhouse, Ashby/Ashby e Spotify/Lever, com adapters implementados. A execução global coleta todas as fontes habilitadas e retorna exit code 1 se alguma falhar, preservando os resultados das outras. Use `--list` para conferir os UUIDs antes de selecionar uma fonte.
 
 A saída é JSON estruturado por execução: source/jobSourceId, status, horários, duração, contagens, rejeições/avisos seguros e erro classificado. SUCCESS significa que a gravação e a finalização foram confirmadas no PostgreSQL. Uma única fonte com FAILED torna o comando malsucedido, sem desfazer fontes que tiveram sucesso.
 
@@ -76,4 +76,36 @@ Integração usa PostgreSQL separado: migração nova, SyncService/Prisma reais 
 
 O runner de browsers cria um schema novo após validar identidade do cluster, testa vazio real nos dois browsers, alimenta 23 fixtures sintéticas por SyncService e executa listagem/filtros/paginação. API/web usam builds e servidores próprios; banco diário não é alterado. Não há dependência Greenhouse nesses testes. Interceptações são usadas apenas para estados de falha visual. Cada execução preserva schemas; não repita sem necessidade e não limpe recursos automaticamente.
 
-S2-01 adicionará Ashby/Lever no mesmo contrato; S2-02 detalhe; S2-03 fontes/histórico; S2-04 políticas mais amplas de resiliência; S2-05 completa homologação, incluindo benchmark RNF-009 de 10 mil anúncios. Esse benchmark ainda não foi executado.
+S2-01/02/03 estão implementadas e descritas abaixo. S2-04 ampliará resiliência operacional; S2-05 completa homologação, incluindo benchmark RNF-009 de 10 mil anúncios. Esse benchmark ainda não foi executado.
+
+## Detalhes, empresas, fontes e histórico — S2-02/S2-03
+
+Todas as rotas abaixo são GET sob `/api/v1`, com Cache-Control: no-store. Não há POST/CRUD/acionamento de coleta. Erros seguem `{statusCode, code, message}`; consultas inválidas retornam 400. Campos internos, mensagens brutas e credenciais não são publicados.
+
+| Endpoint     | Filtros opcionais                                          | Ordenação                                                  |
+| ------------ | ---------------------------------------------------------- | ---------------------------------------------------------- |
+| `/jobs/:id`  | UUID obrigatório no caminho                                | Registro único; 400 para UUID inválido, 404 se inexistente |
+| `/companies` | q (nome, literal/case-insensitive, até 200 caracteres)     | name ASC, id ASC                                           |
+| `/sources`   | platform, companyId (UUID), enabled (true/false)           | empresa.name ASC, platform ASC, boardKey ASC, id ASC       |
+| `/sync-runs` | sourceId (UUID), platform, status (RUNNING/SUCCESS/FAILED) | startedAt DESC, id DESC                                    |
+
+Listas usam `{items, page, pageSize, total}`: page inteiro >=1 padrão 1; pageSize inteiro 1–100 padrão 20; deslocamento máximo 2147483647. Filtros combinam por AND, textos são trim/NFC, vazios são ignorados, repetições de parâmetros conhecidos são inválidas. UUID inexistente como filtro retorna lista vazia 200. Total e itens compartilham snapshot RepeatableRead.
+
+Detalhes incluem os campos públicos da listagem, description textual/null e isListed. URL legada inválida vira null. Publicação ausente permanece null; firstSeenAt é identificação, não publicação. Busca padrão exige isListed=true; um anúncio explicitamente não listado pode ser acessado por seu ID, com aviso na UI.
+
+Empresa: id/name/websiteUrl validada/sourceCount. Fonte: id/company{id,name}/platform/boardKey/region/enabled/latestRun/lastSuccessfulAt. latestRun é a última tentativa iniciada; lastSuccessfulAt é a maior conclusão de SUCCESS. Não são intercambiáveis. Projeções de relações limitadas evitam carregar o histórico inteiro.
+
+Execução: id/source/status/startedAt/finishedAt/durationMs/fetchedCount/createdCount/updatedCount/skippedCount/errorCode. Duração null se RUNNING, conclusão ausente ou intervalo inconsistente. Códigos passam por allowlist (desconhecidos viram UNKNOWN_ERROR); errorMessage não é exposta. RUNNING antigo continua incompleto; não é reclassificado automaticamente.
+
+```sh
+curl 'http://127.0.0.1:3001/api/v1/jobs?platform=ASHBY&pageSize=5'
+# Substitua UUID pelo id retornado na consulta anterior:
+curl 'http://127.0.0.1:3001/api/v1/jobs/UUID'
+curl 'http://127.0.0.1:3001/api/v1/companies'
+curl 'http://127.0.0.1:3001/api/v1/sources?enabled=true'
+curl 'http://127.0.0.1:3001/api/v1/sync-runs?pageSize=10'
+```
+
+O registry agora cobre GREENHOUSE, ASHBY e LEVER. O CLI global respeita fontes desativadas e trata falhas por fonte; uma fonte Lever válida não recebe mais UNSUPPORTED_PLATFORM. O seed oferece Figma/figma, Ashby/Ashby e Spotify/spotify verificados. Use `pnpm sync:jobs --list` para obter IDs, `pnpm sync:jobs --source UUID` para uma fonte ou `pnpm sync:jobs --concurrency 1` para todas habilitadas, sequencialmente. Não repetir coletas externas para substituir os testes determinísticos.
+
+Fluxo: **API pública → ConnectorRegistry/adapter → CollectionResult → SyncService → Prisma → PostgreSQL → GET /jobs ou /jobs/:id → Next.js**. CatalogModule lê as fontes/execuções produzidas por esse mesmo fluxo. As páginas nunca chamam provedores diretamente.

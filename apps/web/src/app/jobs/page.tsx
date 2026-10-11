@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { SiteHeader } from '../../components/site-header';
 import { Suspense } from 'react';
 import { JobsBrowser, JobsLoading } from '../../components/jobs-browser';
 
@@ -10,24 +10,7 @@ export const metadata = {
 export default function Jobs() {
   return (
     <div className="site-shell min-h-screen">
-      <a className="skip-link" href="#main">
-        Pular para o conteúdo
-      </a>
-      <header className="site-header">
-        <Link className="wordmark" href="/" aria-label="InternRadar, início">
-          <span className="brand-icon" aria-hidden="true">
-            ◎
-          </span>
-          Intern<span>Radar</span>
-          <span className="brand-dot">.</span>
-        </Link>
-        <nav className="header-nav" aria-label="Principal">
-          <Link href="/jobs" aria-current="page">
-            Oportunidades
-          </Link>
-          <Link href="/">Saúde da API</Link>
-        </nav>
-      </header>
+      <SiteHeader current="jobs" />
       <main id="main" className="jobs-main">
         <section className="jobs-intro">
           <p className="eyebrow">
