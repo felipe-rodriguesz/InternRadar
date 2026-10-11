@@ -51,3 +51,5 @@ A configuração não torna checks obrigatórios nem modifica proteção da main
 Referências: [services PostgreSQL](https://docs.github.com/en/actions/tutorials/use-containerized-services/create-postgresql-service-containers), [setup-node](https://github.com/actions/setup-node), [pnpm/action-setup](https://github.com/pnpm/action-setup).
 
 S1-03/S1-04/S1-05 amplia a mesma pipeline, sem novas dependências/actions ou permissões. Os testes obrigatórios continuam offline em relação às fontes externas. Não usa o banco da aplicação para fixtures de vagas; ambos os clusters existem apenas no runner.
+
+Homologação S1-03/S1-04/S1-05: [run 38123375563](https://github.com/felipe-rodriguesz/InternRadar/actions/runs/38123375563), HEAD 3e700fa, aprovado com 37 unitários, 2 saúde HTTP, 23 integração PostgreSQL e 22 Playwright (84 testes). Todos os passos concluídos, incluindo integridade da especificação e encerramento dos serviços. O [PR #16](https://github.com/felipe-rodriguesz/InternRadar/pull/16) mostra o check correspondente ao último commit.
