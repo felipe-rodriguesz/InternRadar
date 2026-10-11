@@ -1,75 +1,100 @@
 # InternRadar
 
-Plataforma Full Stack pessoal para centralizar vagas de estágio de fontes públicas autorizadas. O MVP terá sincronização manual, persistência, consulta e interface básica; automação, alertas e IA ficam para fases posteriores.
+Plataforma pessoal para centralizar vagas de estágio em tecnologia de fontes públicas autorizadas. O MVP terá sincronização manual, persistência, filtros e acesso ao anúncio original. Automação, notificações e IA ficam para fases posteriores.
 
-A [especificação oficial v1.0](docs/requirements.md) permanece íntegra. [Alterações propostas](docs/requirements-proposed-changes.md) registram decisões complementares já aprovadas sem reescrever o original.
+A [especificação oficial v1.0](docs/requirements.md) está preservada. [Decisões complementares](docs/requirements-proposed-changes.md), [arquitetura](docs/architecture.md) e [Sprint 0](docs/sprint-0.md) registram o escopo e as evidências.
 
-## Estado e arquitetura
+## Estado atual
 
-S0-01 integrada pelo [PR #2](https://github.com/felipe-rodriguesz/InternRadar/pull/2). S0-02/S0-03 entregam documentação e PostgreSQL local homologado, com revisão no [PR #5](https://github.com/felipe-rodriguesz/InternRadar/pull/5). Resultados e pendências estão no [acompanhamento da Sprint 0](docs/sprint-0.md).
+S0-01/S0-02/S0-03 integradas. O lote S0-04/S0-05 implementa Next.js, NestJS, saúde com consulta real ao PostgreSQL, schema Prisma, migração e seed idempotente. A página inicial informa conexão, carregamento, falhas e nova tentativa. Não há coleta, listagem de vagas ou sincronizações implementadas nesta entrega.
 
 ```text
-apps/web/                 Frontend Next.js com App Router
-apps/api/                 Backend NestJS modular
-compose.yaml              PostgreSQL de desenvolvimento e testes
-scripts/verify-database.mjs Testes reais e isolados da infraestrutura
-.github/                  Templates de Issues e Pull Request
-CONTRIBUTING.md            Fluxo de contribuição e qualidade
-docs/architecture.md      Visão das camadas e decisões
-docs/decisions/           ADRs
-docs/database.md          Operação e diagnóstico do banco
-docs/requirements.md      Especificação original preservada
-docs/sprint-0.md          Rastreabilidade e evidências
+apps/web/src/app/           Next.js App Router, layout e página inicial
+apps/web/src/components/    Estado da conexão com a API
+apps/web/test/              Testes Chromium/Firefox com Playwright
+apps/api/src/config/        Ambiente privado validado
+apps/api/src/health/        Saúde da API e consulta real ao banco
+apps/api/src/database/      Prisma Client, adapter-pg e módulo NestJS
+apps/api/prisma/            Schema, migrações e seed
+apps/api/test/              Testes HTTP, ambiente e persistência
+compose.yaml               PostgreSQL desenvolvimento/testes separados
+docs/                      Operação, decisões e evidências
 ```
 
-[Arquitetura e ADRs](docs/architecture.md) explicam monorepo com pnpm workspaces, separação web/API, backend modular, persistência, APIs públicas, ambientes e GitHub Flow.
+## Preparação
 
-## Pré-requisitos e instalação
+- Node **24.21.0**, pnpm **12.12.0**, Docker Engine **29.8.2** e Compose **5.5.1**, validados no Ubuntu/WSL2.
+- Use o checkout no filesystem do Ubuntu. Não misture dependências Windows/Linux. Nenhuma instalação global é necessária para o projeto.
+- Antes de iniciar Docker, confira containers/volumes e portas. Preserve os recursos antigos: [operação e recuperação](docs/database.md).
 
-- Node **24.21.0** e pnpm **12.12.0**, registrados no projeto. Com nvm instalado, `nvm use` seleciona a versão existente.
-- Git, Docker Desktop integrado ao WSL2 e Docker Compose. As versões verificadas são Docker Engine/CLI **29.8.2** e Compose **5.5.1**.
-- No Windows, usar o checkout no sistema de arquivos do Ubuntu/WSL2. Não misturar instalações de dependências Windows/Linux.
-
-```sh
+```bash
 pnpm install --frozen-lockfile
-pnpm workspace:list
-pnpm lint
-pnpm format:check
+if [ ! -e .env ]; then cp .env.example .env; fi
+if [ ! -e apps/web/.env.local ]; then cp apps/web/.env.example apps/web/.env.local; fi
 ```
 
-Ferramentas compartilhadas ficam na raiz; dependências de execução pertencerão ao aplicativo que as utiliza. Versões diretas são exatas e resoluções transitivas ficam no lockfile único. TypeScript strict é herdado pelos aplicativos. O lint analisa os arquivos JS/TS existentes; typecheck/build/test das aplicações serão introduzidos na S0-04, e a CI na S0-06.
+Substitua os placeholders no `.env` por senhas locais distintas. Atualize `DATABASE_URL` e `TEST_DATABASE_URL` de acordo com seus respectivos `POSTGRES_*`/`POSTGRES_TEST_*`. Caracteres especiais nas credenciais precisam de percent-encoding na URL.
 
-`pnpm format <arquivos>` escreve somente nos caminhos indicados. Prettier não altera `docs/requirements.md` ou `pnpm-lock.yaml`. EditorConfig e atributos Git mantêm LF/UTF-8, com CRLF para scripts específicos Windows e exceção restrita às quebras Markdown do original.
+**Neste workspace**, PostgreSQL 16 nativo já ocupa 5432. O `.env` privado foi configurado para o projeto Compose `internradar-apps`, com desenvolvimento em **15432** e testes em **15433**. Os comandos abaixo usam esse arquivo automaticamente. Um clone novo usa os padrões 5432/5433 do exemplo; se estiverem ocupados, altere as portas e URLs antes de criar os containers. Não reutilize volumes Bookworm sem análise de compatibilidade.
 
-## Executar e verificar PostgreSQL
-
-Siga [docs/database.md](docs/database.md) para criar o `.env` privado a partir do exemplo, substituir placeholders e manter `DATABASE_URL` coerente. Os exemplos são versionados; arquivos locais, senhas e artefatos são ignorados.
+## Iniciar
 
 ```sh
 pnpm db:config
 pnpm db:up
-pnpm db:status
-pnpm db:logs
 pnpm db:test:up
-pnpm db:verify
-pnpm db:test:stop
-pnpm db:stop
+pnpm prisma:generate
+pnpm db:migrate
+pnpm db:seed
+pnpm dev
 ```
 
-Desenvolvimento usa `127.0.0.1:5432`; testes usam `127.0.0.1:5433`, com portas configuráveis, clusters/redes/volumes distintos e profile `test`. Imagem PostgreSQL **17.11-trixie**, fixada por digest OCI. Stop/restart preservam os volumes diários. A [recuperação da imagem](docs/postgresql-recovery.md) documenta a mudança de base Debian e os cuidados com clusters existentes.
+Acesse **<http://localhost:3000>**. `pnpm dev` inicia os dois workspaces; também é possível usar terminais separados:
 
-`db:verify` cria um projeto Docker temporário próprio e testa configuração, saúde, conexão, autenticação, persistência após restart/recriação e isolamento. Ao finalizar, para seus containers e preserva os volumes; o nome do projeto é informado no terminal. Não usa nem apaga dados diários. O teste é independente do `.env` local.
+```sh
+pnpm --filter @internradar/api dev
+pnpm --filter @internradar/web dev
+```
 
-Frontend recebe somente `apps/web/.env.local` com URL pública da API. Não copie credenciais em `NEXT_PUBLIC_*`. A API/Prisma carregarão o ambiente privado da raiz nas S0-04/S0-05.
+A API usa `127.0.0.1:3001`. O navegador utiliza apenas `NEXT_PUBLIC_API_BASE_URL`; credenciais permanecem na API. `API_PORT`, `CORS_ORIGINS` e a URL pública precisam ser coerentes ao trocar portas. Detalhes: [aplicações e testes](docs/applications.md).
+
+## Confirmar o funcionamento
+
+```sh
+curl --fail http://localhost:3001/api/v1/health
+pnpm --filter @internradar/api db:migrate:status
+pnpm db:status
+```
+
+A saúde retorna `{"status":"ok","service":"internradar-api","database":{"status":"connected"}}` **somente após `SELECT 1` executado pelo Prisma**. Falha no banco retorna 503 sanitizado; `/health` redireciona com 307 para a rota canônica. Isso verifica a conexão, não substitui a checagem de migrações/seed. A interface diferencia banco indisponível de falha de conexão com a API.
+
+O seed cadastra **Figma/Greenhouse e Spotify/Lever**, com boards verificados. Reexecuções preservam IDs e `enabled=false`; nenhuma vaga é coletada. A verificação Ashby ficou pendente por HTTP 403. [Fontes e evidências](docs/seed-sources.md).
+
+## Qualidade e testes
+
+Com ambos os bancos em execução e migrações aplicadas:
+
+```sh
+pnpm --filter @internradar/web exec playwright install chromium firefox
+pnpm lint
+pnpm format:check
+pnpm typecheck
+pnpm build
+pnpm test
+pnpm test:integration
+pnpm workspace:list
+```
+
+`pnpm test` executa testes da API e dos navegadores; requer os builds da API e web. Encerre os dev servers antes dos testes. Playwright inicia servidores próprios em 3100/3001. `test:integration` exige `TEST_DATABASE_URL`, confirma que o cluster difere do diário e cria um schema novo no banco de testes. Aplica a migração, testa constraints/seed e preserva o schema para inspeção; não cria volumes adicionais nem apaga dados existentes.
+
+`pnpm db:verify` continua disponível para homologar a infraestrutura em outro projeto Compose. Ele cria volumes adicionais: não precisa ser repetido em cada alteração de aplicação. `pnpm format <arquivos>` formata apenas os caminhos indicados; especificação e lockfile ficam preservados.
+
+Para executar os artefatos compilados, após `pnpm build`, use `pnpm --filter @internradar/api start` e `pnpm --filter @internradar/web start` em terminais separados. Encerre os aplicativos com Ctrl+C; `pnpm db:stop` e `pnpm db:test:stop` param os bancos sem apagar volumes.
 
 ## Contribuição e próximos passos
 
-[CONTRIBUTING.md](CONTRIBUTING.md) descreve Issue → branch → commits Conventional Commits → checks → PR → revisão → merge autorizado. O lote atual está registrado nas [Issues #3](https://github.com/felipe-rodriguesz/InternRadar/issues/3) e [#4](https://github.com/felipe-rodriguesz/InternRadar/issues/4), no [Milestone Sprint 0](https://github.com/felipe-rodriguesz/InternRadar/milestone/1).
+[CONTRIBUTING.md](CONTRIBUTING.md) descreve Issue → branch → Conventional Commits → checks → PR → revisão → merge autorizado. As entregas deste lote estão nas [Issues #6](https://github.com/felipe-rodriguesz/InternRadar/issues/6) e [#7](https://github.com/felipe-rodriguesz/InternRadar/issues/7).
 
-S0-04 inicializará aplicações, carregamento de ambiente e saúde/comunicação. S0-05 introduzirá Prisma 7, entidades, migrações e seed idempotente. S0-06 acrescentará CI e verificará a fundação completa. Ainda não há aplicativos executáveis, schema do produto, seed, coleta de vagas ou deploy público. A licença continua em aberto conforme Q-10.
+S0-06 adicionará GitHub Actions com estes comandos reais. Conectores, sincronização e consulta de vagas pertencem às Sprints 1/2. Deploy público, autenticação, licença e automações continuam fora deste lote; o projeto deve permanecer local.
 
-## Aplicações — S0-04
-
-`pnpm dev` inicia os dois workspaces; alternativamente, execute `pnpm --filter @internradar/api dev` e `pnpm --filter @internradar/web dev` em terminais separados. Acesse <http://localhost:3000>. A API escuta somente em `127.0.0.1:3001`; seu endpoint é `/api/v1/health`, com alias `/health` via redirecionamento. `CORS_ORIGINS` configura origens locais permitidas.
-
-`pnpm typecheck`, `pnpm build` e `pnpm test` executam verificações reais. Antes dos testes de navegador, instale os browsers locais com `pnpm --filter @internradar/web exec playwright install chromium firefox` e compile a API. Playwright inicia os próprios servidores em 3100/3101, sem reutilizar servidores pessoais. A integração Prisma está na etapa seguinte deste lote.
+Os testes de navegador usam a URL pública padrão `http://127.0.0.1:3001/api/v1` incorporada ao build. Se alterá-la para desenvolvimento, refaça o build com esse valor antes de executar a suíte. Os servidores de teste recusam portas já ocupadas.

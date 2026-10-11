@@ -6,15 +6,21 @@ Leia [requirements.md](docs/requirements.md), [alterações propostas](docs/requ
 
 Pré-requisitos: Git, Node 24.21.0, pnpm 12.12.0 e Docker Compose com daemon acessível. No Windows, o ambiente validado é Ubuntu/WSL2 com Docker Desktop integrado. Não misture instalações de dependências Windows e Linux no mesmo checkout.
 
+Prepare ambiente privado, bancos, migrações/seed e browsers conforme o [README](README.md). A geração do client também é necessária para o lint com tipos da API:
+
 ```sh
 pnpm install --frozen-lockfile
+pnpm prisma:generate
 pnpm workspace:list
 pnpm lint
 pnpm format:check
-pnpm db:verify
+pnpm typecheck
+pnpm build
+pnpm test
+pnpm test:integration
 ```
 
-`db:verify` executa testes reais em um projeto Docker temporário independente, sem exigir `.env` diário. Consulte [docs/database.md](docs/database.md) para iniciar/parar os bancos de uso local. Frontend/API ainda não podem ser executados: sua inicialização e scripts pertencem à S0-04.
+`db:verify` executa testes reais em um projeto Docker temporário independente, sem exigir `.env` diário. Consulte [docs/database.md](docs/database.md) para iniciar/parar os bancos de uso local. Prepare ambiente, migrações/seed e browsers conforme [README](README.md) antes dos testes de aplicação. A suíte db:verify cria volumes próprios e não precisa ser repetida para alterações comuns.
 
 ## Fluxo de trabalho
 
@@ -31,11 +37,11 @@ Exemplos: `docs(adr): record local environment decisions`, `chore(db): configure
 ## Qualidade e testes
 
 - ESLint procura problemas estáticos; Prettier define apresentação. `pnpm format <arquivos>` escreve somente nos caminhos indicados.
-- TypeScript strict é obrigatório; configuração específica dos frameworks será completada na S0-04.
+- TypeScript strict é obrigatório; configurações específicas Next.js/NestJS são herdadas da base.
 - `docs/requirements.md` e `pnpm-lock.yaml` ficam fora do Prettier. Nunca altere manualmente o lockfile para esconder inconsistências.
 - Dependências diretas têm versões exatas e pertencem ao pacote que as usa; ferramentas comuns ficam na raiz.
-- Testes de conectores usarão fixtures identificadas; integração de dados usará PostgreSQL separado. Os testes atuais verificam somente a infraestrutura implementada.
-- `typecheck`, builds de aplicativos, migrações e seed ainda são pendentes. CI será introduzida na S0-06 com os comandos reais correspondentes.
+- Testes de conectores usarão fixtures identificadas; integração de dados usará PostgreSQL separado. Os testes atuais verificam saúde HTTP, interface e persistência real em schema novo no cluster separado.
+- Typecheck, builds, migrações e seed são executáveis. CI será introduzida na S0-06 com os comandos reais correspondentes. Schemas de teste são preservados; não limpar automaticamente dados/volumes.
 
 ## Revisão
 

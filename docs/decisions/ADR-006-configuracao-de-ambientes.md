@@ -21,10 +21,10 @@ Uma origem privada evita duplicar senhas. Prefixos `NEXT_PUBLIC_` são reservado
 - Compose rejeita variáveis obrigatórias vazias; PostgreSQL usa autenticação SCRAM para TCP.
 - Alterar portas/credenciais exige atualizar a URL privada coerentemente; exemplos não são senhas de uso real.
 - `db:verify` gera credenciais, portas e projeto Docker temporários próprios; confirma sua propriedade, para os containers e preserva os volumes. Uma remoção posterior depende de revisão do impacto e autorização.
-- Ambiente de testes do produto e conexão Prisma ainda serão configurados na S0-05.
+- TEST_DATABASE_URL e conexão Prisma foram implementados na S0-05; testes verificam cluster separado antes de criar schemas.
 
 ## Alternativas consideradas
 
 Senhas no Compose/repositório violariam RNF-006. Duplicar `.env` da API geraria divergência. Publicar portas em todas as interfaces ampliaria a exposição. Reutilizar o banco diário nos testes comprometeria o isolamento.
 
-Procedimento de operação: [banco local](../database.md). Aplicativos ainda não estão inicializados.
+Procedimento de operação: [banco local](../database.md). Aplicativos, variáveis e testes: [execução](../applications.md).

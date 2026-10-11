@@ -9,7 +9,8 @@
 - Milestone: [Sprint 0 — Project Foundation](https://github.com/felipe-rodriguesz/InternRadar/milestone/1).
 - S0-01 integrada por rebase no [PR #2](https://github.com/felipe-rodriguesz/InternRadar/pull/2), em `acaff60f8bb4aacc703fad89886b033807b0588c`; Issue #1 fechada.
 - Lote autorizado S0-02/S0-03: branch `chore/s0-02-03-docs-postgresql`, derivada dessa main após `git pull --ff-only`. Issues [#3](https://github.com/felipe-rodriguesz/InternRadar/issues/3) e [#4](https://github.com/felipe-rodriguesz/InternRadar/issues/4), no mesmo Milestone.
-- Estado do lote: S0-02 finalizada e S0-03 homologada após recuperação da imagem PostgreSQL. Entrega no [PR #5](https://github.com/felipe-rodriguesz/InternRadar/pull/5), aguardando revisão; merge não autorizado. Os registros das falhas anteriores abaixo são históricos.
+- S0-02/S0-03 integradas por rebase no [PR #5](https://github.com/felipe-rodriguesz/InternRadar/pull/5), em `2507b8ccfea3da388dea67e16a1e99677624d094`, após autorização e conferência do HEAD `ba3e6c5b7f05a865a0ebee0981f7616200360a0b`. Três commits preservados; Issues #3/#4 fechadas automaticamente. Os registros das falhas anteriores abaixo são históricos.
+- Lote S0-04/S0-05: branch `feat/s0-04-05-apps-prisma`, Issues #6/#7. Aplicações e persistência implementadas; resultados e pendência de verificação Ashby registrados ao final. S0-06 ainda não iniciada.
 
 ## Distribuição das validações aprovada
 
@@ -257,7 +258,7 @@ Referências: [typescript-eslint: versões suportadas](https://typescript-eslint
 
 ## Pendências rastreáveis
 
-Todas as linhas abaixo estão **pendentes**, sem evidência de execução nesta entrega.
+Pendências originalmente abertas na S0-01. As linhas S0-04-Q01/Q02/V01/V02/V03 e S0-05-V01/V02/V03/V04 foram **validadas em 11/10/2026**, com evidências no registro S0-04/S0-05 ao final. S0-06-V01 permanece pendente da execução em CI; a instalação limpa local já foi verificada.
 
 | ID        | Etapa responsável | Validação/entrega esperada                                                                                                                                                     |
 | --------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -272,7 +273,7 @@ Todas as linhas abaixo estão **pendentes**, sem evidência de execução nesta 
 | S0-05-V04 | S0-05             | Executar seed repetido e verificar idempotência, preservação de `enabled` e constraints no banco separado de testes                                                            |
 | S0-06-V01 | S0-06             | Comprovar instalação limpa, checks pertinentes e CI; concluir TA-01/TA-12 no escopo da fundação                                                                                |
 
-S0-01d-P01 concluída no escopo compartilhado. S0-02-D01 concluída no lote atual: ADRs e alterações propostas registrados sem modificar a especificação. As pendências de aplicativos, persistência do produto e CI continuam nas etapas acima.
+S0-01d-P01 concluída no escopo compartilhado. S0-02-D01 concluída no lote atual: ADRs e alterações propostas registrados sem modificar a especificação. Aplicativos e persistência foram validados no lote S0-04/S0-05; CI continua na S0-06.
 
 ## Revisão para publicação da S0-01
 
@@ -397,7 +398,7 @@ A variante oficial Debian Trixie preserva PostgreSQL 17.11 e o caminho de dados,
 
 Revisão final da recuperação: `pnpm install --frozen-lockfile --strict-peer-dependencies`, `pnpm lint`, `pnpm format:check`, `pnpm workspace:list`, `pnpm list --depth 0`, `node --check scripts/verify-database.mjs` e `git diff main --check` aprovados. Os 35 arquivos versionáveis passaram na revisão de credenciais locais/padrões de segredo, YAML/JSON, links, ADRs e LF. O parser YAML considera os múltiplos documentos do lockfile pnpm. API TypeScript confirmou strict nos três tsconfigs; `.env` segue ignorado, modo 0600. SHA-256 da especificação: `917610528b367257bc1fe2da1a02ac1527e30e6cd2f52052e45cd95e7414e65e`, com igualdade de bytes ao original.
 
-Inventário, digests, verificações de integridade e limites constam em [postgresql-recovery.md](postgresql-recovery.md). Issues #3/#4 permanecem abertas até integração autorizada do PR #5. Nenhum merge, tag, release ou limpeza de recursos faz parte desta recuperação.
+Inventário, digests, verificações de integridade e limites constam em [postgresql-recovery.md](postgresql-recovery.md). Na conclusão dessa recuperação, Issues #3/#4 permaneceram abertas até a integração posteriormente autorizada do PR #5. Nenhum merge, tag, release ou limpeza de recursos fez parte da recuperação.
 
 ## S0-04/S0-05 — Aplicações e persistência
 
@@ -415,4 +416,53 @@ API CommonJS usa `module/moduleResolution: NodeNext` para modelar `require(esm)`
 - Nesta etapa, saúde declara banco `not_checked`; a conexão real será introduzida na S0-05. `/health` redireciona com 307 para `/api/v1/health`.
 - `next dev` gera `apps/web/AGENTS.md`; mantido no repositório. Declarações `next-env.d.ts` são geradas e ignoradas.
 
-S0-05 segue em implementação; resultados posteriores serão registrados separadamente.
+### Persistência S0-05 — 11/10/2026
+
+Prisma CLI/client/adapter-pg 7.10.0 e pg 8.23.1 fixados. Cliente `prisma-client` gerado em CommonJS, carregado por NestJS compilado e em desenvolvimento. `GET /api/v1/health` agora executa `SELECT 1`: retorna `connected` somente após sucesso; falha real de banco resulta em 503 sanitizado. O frontend distingue API inacessível de API acessível com banco indisponível.
+
+- Quatro entidades, enums e relações da seção 8 implementados. Migração `20261011063000_init` aplicada em banco de desenvolvimento vazio e schema vazio no cluster de testes.
+- UUIDs nativos, unicidades compostas, região obrigatória/default GLOBAL, enabled true, campos/datas opcionais e contadores não negativos comprovados. CHECKs/trigger versionados protegem invariantes, incluindo firstSeenAt imutável.
+- Seed CLI executado duas vezes. Figma/Greenhouse e Spotify/Lever foram verificados por HTTP 200; sem vagas artificiais ou coleta implementada. Evidências em [seed-sources.md](seed-sources.md).
+- Oito testes de persistência reais aprovados, incluindo seed idempotente/IDs estáveis/disabled preservado, relações/defaults, unicidades, upsert concorrente, FKs/restrições de exclusão, enums/URLs/textos, contadores/datas e isolamento.
+- Testes usam o schema novo `check_0bdfa305fe194f7c9c7cb9d6fc4d6077`, preservado no cluster separado. Identificadores dos clusters comparados antes de escrever; inventário e contagens de desenvolvimento permaneceram iguais após a suíte. Nenhum mock substituiu acesso ao PostgreSQL.
+- Quatro testes de ambiente/HTTP da API aprovados, incluindo conexão real recusada e HTTP 503 sem vazamento de credenciais.
+- Oito testes web aprovados em Chromium/Firefox: conexão real/retry, 503 visual simulado, loading/falha de rede/recuperação e viewport 375 px/teclado. A simulação de erro da interface é separada da falha SQL real testada na API.
+
+Uma execução intermediária em `next dev` falhou no Firefox: a resposta HTTP 200 foi observada, mas a interface terminou em erro. A causa exata não foi confirmada; a suíte foi ajustada para os builds de produção, conforme a orientação do Next.js para E2E, e passou integralmente. Não há retries automáticos mascarando falhas. API/web também foram iniciadas separadamente no workspace: sem API, a interface exibiu falha; com a API, confirmou PostgreSQL. Acesso pelo navegador em `http://localhost:3000` no WSL validado.
+
+### Preservação da infraestrutura
+
+A porta 5432 já era ocupada por PostgreSQL 16 nativo do Ubuntu, com encaminhamento WSL. A tentativa de iniciar o novo projeto padrão falhou por conflito de porta, sem erro de I/O. Serviço nativo, clusters antigos, imagens e redes não foram removidos ou alterados para liberar a porta.
+
+O `.env` privado foi ajustado para `COMPOSE_PROJECT_NAME=internradar-apps`, portas locais 15432/15433 e URLs correspondentes. Dois volumes novos, distintos, inicializados exclusivamente com PostgreSQL 17.11 Trixie homologado. O container/volume padrão vazio criado na tentativa anterior também permanece preservado. Não houve reutilização de clusters Bookworm nem alteração do digest do Compose.
+
+Ambos os containers diários permaneceram healthy. Cerca de 15 GiB livres no C: durante a validação; nenhum novo erro de I/O/SIGBUS observado. A suíte antiga `db:verify` não foi repetida: já homologada na S0-03, criaria novos volumes desnecessários. Foram executados os testes específicos de Prisma neste lote.
+
+### Critérios e próximas tarefas
+
+- [x] Aplicações reais, strict, lint dos frameworks e scripts centrais/individuais.
+- [x] Ambiente validado, CORS restrito e URLs/segredos separados por responsabilidade.
+- [x] Frontend responsivo/acessível com loading, sucesso, erro e nova tentativa.
+- [x] Prisma gerado, compilado e executado com NestJS/PostgreSQL.
+- [x] Migração versionada, consultas/gravações reais, constraints e seed idempotente.
+- [x] Testes de persistência isolados, enabled=false preservado e recursos antigos mantidos.
+- [x] Especificação v1.0 preservada; decisões novas em ADR-008 e alterações complementares.
+- [ ] S0-05-P01: verificar um board Ashby antes de S2-01. Endpoints consultados retornaram 403; nenhum identificador Ashby foi incluído no seed sem evidência.
+- [ ] S0-06-V01: provisionar banco/browsers no GitHub Actions e executar os comandos reais; configuração de ambiente em runner limpo e critérios TA-01/TA-12 em CI.
+- [ ] S0-06-P01: acompanhar suporte dos plugins à major seguinte do ESLint; major 9 permanece compatível e fixada.
+
+Builds/integração não representam implementação de conectores, sincronização, listagem de vagas ou outras funcionalidades futuras. S0-06 não foi implementada neste lote.
+
+### Verificação final em instalação reproduzível
+
+Uma cópia dos arquivos candidatos, sem node_modules, client gerado ou builds, foi preparada fora do checkout, sem criar outro repositório. O `.env` privado foi copiado somente para esse diretório local protegido, nunca para o Git. `pnpm install --frozen-lockfile --strict-peer-dependencies` instalou 577 pacotes com versões/peers resolvidos e lockfile inalterado. Não houve instalação global.
+
+Nessa cópia passaram, em sequência: `pnpm prisma:generate`, `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm build`, `pnpm test` (4 API + 8 Playwright) e `pnpm workspace:list` (raiz/api/web). A geração, compilação e execução do NestJS com Prisma foram reproduzidas. A suíte de persistência de 8 testes foi executada anteriormente no checkout; não foi repetida sem necessidade.
+
+O lint por workspace identificou inicialmente um aviso de descoberta do diretório Next.js, pois rootDir dependia do diretório de execução. A configuração agora resolve esse caminho a partir do arquivo ESLint; lint da raiz e de ambos os workspaces passou sem esse aviso, inclusive na cópia limpa.
+
+No checkout final: Prisma validate e migrate status aprovados (uma migração aplicada), `db:config`, formatação e `git diff main --check` aprovados. A API compilada também respondeu HTTP 200/connected via localhost tanto no Ubuntu quanto pelo PowerShell do Windows. Os servidores próprios de verificação foram encerrados.
+
+Revisão dos 71 arquivos candidatos: JSON/YAML/LF válidos, nenhuma credencial local/padrão de token/chave privada encontrado; bundles públicos sem DATABASE_URL ou senhas do `.env`. Exemplos/lockfile/migrações continuam versionáveis, segredos/artefatos ignorados. Especificação idêntica por bytes/SHA-256 ao original; Compose, digest, tsconfig.base, gitattributes e EditorConfig preservados.
+
+Inventário final: 8 containers, 7 volumes, 12 redes e 3 imagens. Os 5 containers, 4 volumes e 9 redes do inventário inicial permanecem presentes. Dois containers diários healthy, publicados somente em 127.0.0.1:15432/15433. A comparação do kernel, normalizando prefixos de prioridade do baseline, confirmou que os erros de I/O presentes eram anteriores ao lote; nenhum novo erro foi identificado.
