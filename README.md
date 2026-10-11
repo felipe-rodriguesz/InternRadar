@@ -9,8 +9,8 @@ A [especificação oficial v1.0](docs/requirements.md) permanece íntegra. [Alte
 S0-01 integrada pelo [PR #2](https://github.com/felipe-rodriguesz/InternRadar/pull/2). S0-02/S0-03 entregam documentação e PostgreSQL local homologado, com revisão no [PR #5](https://github.com/felipe-rodriguesz/InternRadar/pull/5). Resultados e pendências estão no [acompanhamento da Sprint 0](docs/sprint-0.md).
 
 ```text
-apps/web/                 Frontend Next.js, inicialização na S0-04
-apps/api/                 Backend NestJS modular, inicialização na S0-04
+apps/web/                 Frontend Next.js com App Router
+apps/api/                 Backend NestJS modular
 compose.yaml              PostgreSQL de desenvolvimento e testes
 scripts/verify-database.mjs Testes reais e isolados da infraestrutura
 .github/                  Templates de Issues e Pull Request
@@ -67,3 +67,9 @@ Frontend recebe somente `apps/web/.env.local` com URL pública da API. Não copi
 [CONTRIBUTING.md](CONTRIBUTING.md) descreve Issue → branch → commits Conventional Commits → checks → PR → revisão → merge autorizado. O lote atual está registrado nas [Issues #3](https://github.com/felipe-rodriguesz/InternRadar/issues/3) e [#4](https://github.com/felipe-rodriguesz/InternRadar/issues/4), no [Milestone Sprint 0](https://github.com/felipe-rodriguesz/InternRadar/milestone/1).
 
 S0-04 inicializará aplicações, carregamento de ambiente e saúde/comunicação. S0-05 introduzirá Prisma 7, entidades, migrações e seed idempotente. S0-06 acrescentará CI e verificará a fundação completa. Ainda não há aplicativos executáveis, schema do produto, seed, coleta de vagas ou deploy público. A licença continua em aberto conforme Q-10.
+
+## Aplicações — S0-04
+
+`pnpm dev` inicia os dois workspaces; alternativamente, execute `pnpm --filter @internradar/api dev` e `pnpm --filter @internradar/web dev` em terminais separados. Acesse <http://localhost:3000>. A API escuta somente em `127.0.0.1:3001`; seu endpoint é `/api/v1/health`, com alias `/health` via redirecionamento. `CORS_ORIGINS` configura origens locais permitidas.
+
+`pnpm typecheck`, `pnpm build` e `pnpm test` executam verificações reais. Antes dos testes de navegador, instale os browsers locais com `pnpm --filter @internradar/web exec playwright install chromium firefox` e compile a API. Playwright inicia os próprios servidores em 3100/3101, sem reutilizar servidores pessoais. A integração Prisma está na etapa seguinte deste lote.
