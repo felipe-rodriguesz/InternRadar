@@ -26,4 +26,4 @@ Mudanças relacionadas podem ser revisadas no mesmo PR. Separar aplicativos evit
 
 Repositórios separados aumentariam a coordenação de contratos. Microsserviços acrescentariam operação, comunicação e deploy sem necessidade do MVP. Uma aplicação única com lógica de coleta no frontend contrariaria RNF-002.
 
-Implementado: workspace. Pendente: aplicativos/módulos na S0-04 e conectores nas sprints seguintes.
+Implementados: workspace e aplicativos/módulos da S0-04/S0-05. Conectores permanecem nas sprints seguintes.

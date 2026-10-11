@@ -1,6 +1,6 @@
 # PostgreSQL local
 
-Referências: [ADR-002](decisions/ADR-002-postgresql-prisma.md), [ADR-006](decisions/ADR-006-configuracao-de-ambientes.md) e RF-001/HU-01. Compose executa somente os bancos; aplicativos ficam no host e serão inicializados na S0-04.
+Referências: [ADR-002](decisions/ADR-002-postgresql-prisma.md), [ADR-006](decisions/ADR-006-configuracao-de-ambientes.md) e RF-001/HU-01. Compose executa somente os bancos; Next.js e NestJS executam no host.
 
 ## Preparar
 
@@ -49,7 +49,7 @@ docker compose exec postgres sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" exec psql -h
 docker compose --profile test exec postgres-test sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" exec psql -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -X -c "SELECT current_database();"'
 ```
 
-Os bancos exigem SCRAM para conexões TCP. O healthcheck `pg_isready` verifica disponibilidade, não substitui esse teste de autenticação. A API/Prisma no host usarão loopback; o cliente da aplicação e sua conexão integrada serão validados na S0-05.
+Os bancos exigem SCRAM para conexões TCP. O healthcheck `pg_isready` verifica disponibilidade, não substitui esse teste de autenticação. A API/Prisma usa loopback e seu endpoint de saúde executa uma consulta SQL real.
 
 ## Verificação automatizada
 
@@ -73,4 +73,26 @@ Após validar labels/propriedade, para somente os containers do projeto temporá
 - Falhas nativas no CLI do Docker Desktop/WSL e daemon indisponível são problemas de ambiente; não demonstram sucesso dos testes SQL. Restabeleça Docker Desktop antes de repetir `db:verify`.
 - Se um container próprio ficar unhealthy, consulte `docker logs <nome-do-container>` mesmo após sua parada. A falha anterior `exec format error` foi isolada comparando containers novos, camada gravável e conteúdo do registry; a recuperação e a homologação concluída constam no [registro do diagnóstico](postgresql-recovery.md). Engine acessível e imagem listada não comprovam que PostgreSQL pode executar; não apague volumes nem mascare o erro com overrides.
 
-Sem Prisma, migrações ou seed nesta entrega. O banco separado de testes será consumido pelos testes de persistência da S0-05; a CI correspondente será definida na S0-06.
+## Prisma, migrações e seed — S0-05
+
+O schema em `apps/api/prisma/schema.prisma` define Company, JobSource, Job e SyncRun. A migração `20261011063000_init` inclui enums, FKs, índices únicos e CHECKs/trigger complementares. O diretório de migrações é versionado; client gerado é ignorado.
+
+```sh
+pnpm prisma:generate
+pnpm db:migrate
+pnpm --filter @internradar/api db:migrate:status
+pnpm db:seed
+pnpm test:integration
+```
+
+`db:migrate` aplica migrações existentes com `migrate deploy`, sem reset, shadow database ou geração automática. A migração inicial foi gerada com `prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script` e revisada antes da aplicação. CHECKs SQL reforçam contadores não negativos e campos mínimos; trigger impede alterar `firstSeenAt`. Não substituir migrações por edições manuais no banco.
+
+Prisma CLI lê `.env` explicitamente por `prisma.config.ts`. `DATABASE_URL` atende à API/seed; `TEST_DATABASE_URL` deve apontar ao cluster separado e corresponder a POSTGRES_TEST_DB/POSTGRES_TEST_PORT. O teste compara os identificadores dos clusters, cria somente um schema novo e aplica nele a migração. Não reutiliza/limpa schemas anteriores. A mesma configuração de schema é aplicada ao Prisma e ao search_path do pg; consultas SQL brutas também ficam isoladas.
+
+O seed faz upsert das duas [fontes verificadas](seed-sources.md), preserva a associação existente e `enabled=false`. Não contém vagas, não faz coleta e não exige internet para executar. Testes usam fixtures explicitamente identificadas no schema isolado.
+
+## Ambiente desta homologação
+
+O PostgreSQL 16 nativo do Ubuntu já ocupava 5432; não foi parado nem alterado. A tentativa inicial deixou `internradar-postgres-1` em estado created, com volume `internradar_postgres_data`, preservados. O `.env` privado usa COMPOSE_PROJECT_NAME=internradar-apps, POSTGRES_PORT=15432 e POSTGRES_TEST_PORT=15433, com URLs coerentes. Os volumes diários novos são `internradar-apps_postgres_data` e `internradar-apps_postgres_test_data`; ambos foram inicializados com o digest Trixie homologado.
+
+Todos os recursos das recuperações anteriores continuam preservados. Não foi repetida a suíte db:verify neste lote: sua homologação anterior permanece válida, e a nova entrega testa a aplicação nos dois clusters diários separados. A CI correspondente será definida na S0-06.

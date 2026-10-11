@@ -34,3 +34,5 @@ O conteúdo local de `17.11-bookworm` apresentou entrypoint vazio também em con
 Repetir o pull original reutilizava o cache inconsistente. Removê-lo exigiria intervenção sobre recursos preservados. Alpine acrescentaria mudança de libc, desnecessária para esta recuperação. Trixie mantém Debian/glibc, mas altera suas versões: clusters previamente inicializados exigem análise de collation e backup antes de qualquer migração. A homologação comprova volumes novos, não uma migração de dados Bookworm. [Evidências e limites](../postgresql-recovery.md).
 
 Referência de imagem e layout: [Docker Official Image PostgreSQL](https://hub.docker.com/_/postgres). Execução e recuperação operacional: [banco local](../database.md).
+
+Comprovação posterior (S0-05, 11/10/2026): modelos, migração e seed implementados; geração, compilação CommonJS/NodeNext e execução real Prisma/NestJS/PostgreSQL aprovadas. Detalhes no [ADR-008](ADR-008-apps-prisma-runtime.md) e nas [evidências da Sprint 0](../sprint-0.md).

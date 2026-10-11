@@ -16,4 +16,6 @@ SHA-256 do original: `917610528b367257bc1fe2da1a02ac1527e30e6cd2f52052e45cd95e74
 | AC-08 | S0-01 e DoD 14.2          | Checks devem acompanhar arquivos reais; typecheck/build/test de aplicações na S0-04, integração Prisma na S0-05 e CI na S0-06 | Distribuição aprovada; sem scripts fictícios |
 | AC-09 | Stack e referência Prisma | Manter Prisma major 7; CommonJS condicionado à geração, compilação e execução integrada                                       | S0-05                                        |
 
-Continuam abertas a seleção de fontes reais do seed, licença (Q-10) e decisões de hospedagem. Não foram escolhidas ou implementadas por suposição neste lote.
+S0-04/S0-05 implementaram AC-01/02/03/04/05/09. O alias `/health` redireciona com 307; o endpoint canônico responde JSON e testa PostgreSQL realmente. Fontes verificadas do seed: Figma/Greenhouse e Spotify/Lever; Ashby continua pendente por HTTP 403, conforme [evidências](seed-sources.md). Licença (Q-10) e hospedagem continuam em aberto.
+
+AC-10 — Detalhamento técnico da seção 8, sem novas entidades: UUIDs nativos, timestamptz(3), FKs Restrict, CHECKs para contadores/campos mínimos e trigger de imutabilidade firstSeenAt. [ADR-008](decisions/ADR-008-apps-prisma-runtime.md) registra runtime, saúde e testes; a especificação original permanece intacta.
