@@ -6,7 +6,7 @@ A [especificação oficial v1.0](docs/requirements.md) está preservada. [Decis�
 
 ## Estado atual
 
-S0-01 a S0-05 integradas. A fundação implementa Next.js, NestJS, saúde com consulta real ao PostgreSQL, schema Prisma, migração e seed idempotente. A página inicial informa conexão, carregamento, falhas e nova tentativa. O lote atual adiciona CI e coleta/normalização Greenhouse somente por comando técnico, sem gravação. Sincronização e listagem permanecem nas próximas entregas.
+Sprint 0 e S1-01/S1-02 integradas. O lote S1-03/S1-04/S1-05 implementa sincronização manual Greenhouse, persistência auditável, API paginada e interface `/jobs`. A página inicial leva à pesquisa e mantém a saúde da API. Os anúncios vêm das fontes monitoradas e podem incluir diferentes níveis/localizações; não são classificados automaticamente como estágios.
 
 ```text
 apps/web/src/app/           Next.js App Router, layout e página inicial
@@ -16,6 +16,8 @@ apps/api/src/config/        Ambiente privado validado
 apps/api/src/health/        Saúde da API e consulta real ao banco
 apps/api/src/database/      Prisma Client, adapter-pg e módulo NestJS
 apps/api/src/connectors/    Contratos, normalização e Greenhouse
+apps/api/src/sync/          CLI, SyncRun e upsert transacional
+apps/api/src/jobs/          Consulta paginada com filtros
 apps/api/prisma/            Schema, migrações e seed
 apps/api/test/              Testes HTTP, ambiente e persistência
 compose.yaml               PostgreSQL desenvolvimento/testes separados
@@ -48,10 +50,13 @@ pnpm db:test:up
 pnpm prisma:generate
 pnpm db:migrate
 pnpm db:seed
+pnpm sync:jobs --list
+# Copie o UUID da fonte Figma/Greenhouse habilitada:
+pnpm sync:jobs --source UUID_DA_FONTE
 pnpm dev
 ```
 
-Acesse **<http://localhost:3000>**. `pnpm dev` inicia os dois workspaces; também é possível usar terminais separados:
+Acesse **<http://localhost:3000>**, escolha **Buscar oportunidades**, ou abra **<http://localhost:3000/jobs>**. Pesquise, por exemplo, `intern`; isso é uma busca textual, não uma classificação automática. `pnpm dev` inicia os dois workspaces; também é possível usar terminais separados:
 
 ```sh
 pnpm --filter @internradar/api dev
@@ -64,6 +69,7 @@ A API usa `127.0.0.1:3001`. O navegador utiliza apenas `NEXT_PUBLIC_API_BASE_URL
 
 ```sh
 curl --fail http://localhost:3001/api/v1/health
+curl --fail 'http://localhost:3001/api/v1/jobs?q=intern&pageSize=20'
 pnpm --filter @internradar/api db:migrate:status
 pnpm db:status
 ```
@@ -87,7 +93,7 @@ pnpm test:integration
 pnpm workspace:list
 ```
 
-`pnpm test` executa testes da API e dos navegadores; requer os builds da API e web. Encerre os dev servers antes dos testes. Playwright inicia servidores próprios em 3100/3001. `test:integration` exige `TEST_DATABASE_URL`, confirma que o cluster difere do diário e cria um schema novo no banco de testes. Aplica a migração, testa constraints/seed e preserva o schema para inspeção; não cria volumes adicionais nem apaga dados existentes.
+`pnpm test` executa testes da API e dos navegadores; requer os builds da API e web. Encerre os dev servers antes dos testes. Playwright inicia servidores próprios em 3100/3001 e valida um banco vazio real; depois, o runner grava fixtures em seu schema isolado e testa a listagem. Nenhuma fixture entra no banco diário. `test:integration` exige `TEST_DATABASE_URL`, confirma que o cluster difere do diário e cria um schema novo no banco de testes. Aplica a migração, testa constraints/seed e preserva o schema para inspeção; não cria volumes adicionais nem apaga dados existentes.
 
 `pnpm db:verify` continua disponível para homologar a infraestrutura em outro projeto Compose. Ele cria volumes adicionais: não precisa ser repetido em cada alteração de aplicação. `pnpm format <arquivos>` formata apenas os caminhos indicados; especificação e lockfile ficam preservados.
 
@@ -102,12 +108,20 @@ pnpm greenhouse:check figma
 
 O primeiro comando testa contratos, normalização e falhas sem internet ou banco. O segundo consulta o board público real e imprime contagens/diagnóstico, sem importar vagas no PostgreSQL. Retorna erro se a coleta falhar; não simula sucesso. Não há endpoint administrativo.
 
-[Conectores](docs/connectors.md) descreve mapeamento, URLs permitidas, sanitização, timeout/retries, fixtures e a verificação real. Datas/modalidades ausentes permanecem desconhecidas. O contrato permite adicionar outros adapters sem alterar a futura listagem.
+[Conectores](docs/connectors.md) descreve mapeamento, URLs permitidas, sanitização, timeout/retries, fixtures e a verificação real. Datas/modalidades ausentes permanecem desconhecidas. O contrato permite adicionar outros adapters sem alterar a listagem.
+
+## Sincronização e consulta
+
+`pnpm sync:jobs --source UUID` sincroniza uma fonte; sem `--source`, todas as habilitadas. `--concurrency 1` reduz o máximo padrão de duas por processo. Cada tentativa gera SyncRun; reexecuções atualizam anúncios sem duplicar ou alterar firstSeenAt. Falhas não apagam vagas. Nenhum endpoint administrativo é exposto.
+
+Somente Greenhouse está implementado: a fonte Spotify/Lever do seed produz FAILED/UNSUPPORTED_PLATFORM no comando global, que continua as demais e retorna exit code 1. Para a primeira demonstração use Figma. Detalhes de contadores, falhas, RUNNING incompleto, filtros e datas: [sincronização e API](docs/synchronization.md).
+
+Fluxo: **Greenhouse → Connector → SyncService → Prisma → PostgreSQL → GET /jobs → Next.js**. O navegador consulta exclusivamente a API InternRadar; sincronização acontece somente pelo CLI. A saúde executa SELECT 1; as vagas são lidas da base, sem consultar a origem durante a navegação.
 
 ## Contribuição e próximos passos
 
-[CONTRIBUTING.md](CONTRIBUTING.md) descreve Issue → branch → Conventional Commits → checks → PR → revisão → merge autorizado. As entregas deste lote estão nas [Issues #6](https://github.com/felipe-rodriguesz/InternRadar/issues/6) e [#7](https://github.com/felipe-rodriguesz/InternRadar/issues/7).
+[CONTRIBUTING.md](CONTRIBUTING.md) descreve Issue → branch → commits → checks → PR → revisão → merge autorizado. Lote atual: [#13](https://github.com/felipe-rodriguesz/InternRadar/issues/13), [#14](https://github.com/felipe-rodriguesz/InternRadar/issues/14) e [#15](https://github.com/felipe-rodriguesz/InternRadar/issues/15). [Sprint 1](docs/sprint-1.md) reúne evidências e limitações; [CI](docs/ci.md) reproduz checks e testes isolados.
 
-[GitHub Actions](docs/ci.md) executa checks, PostgreSQL isolado e browsers em PRs; o resultado remoto deve ser conferido nos Checks. [Sprint 1](docs/sprint-1.md) registra o lote das Issues #9/#10/#11. Sincronização, API paginada e interface de vagas continuam para S1-03/S1-04/S1-05; Ashby/Lever para S2-01. Deploy público, autenticação, licença e automações continuam fora deste lote; o projeto deve permanecer local.
+Sprint 2: Ashby/Lever, detalhes de vaga, fontes/histórico e resiliência ampliada. Nenhum desses incrementos foi antecipado. Deploy público, autenticação, licença e automações permanecem fora deste lote; mantenha a aplicação local.
 
 Os testes de navegador usam a URL pública padrão `http://127.0.0.1:3001/api/v1` incorporada ao build. Se alterá-la para desenvolvimento, refaça o build com esse valor antes de executar a suíte. Os servidores de teste recusam portas já ocupadas.

@@ -1,12 +1,12 @@
 # Conectores e Greenhouse
 
-Escopo S1-01/S1-02: RF-004/007/008, HU-03/HU-11, RN-006/007/011/012/013/015, TA-03 e parte de TA-09/TA-11. Não implementa sincronização, banco de vagas, SyncRun, endpoints de administração ou listagem.
+Escopo S1-01/S1-02: RF-004/007/008, HU-03/HU-11, RN-006/007/011/012/013/015, TA-03 e parte de TA-09/TA-11. S1-03 agora consome esses contratos por SyncService; o conector continua sem acesso ao banco.
 
 ## Contrato e responsabilidades
 
 `apps/api/src/connectors/contracts.ts` define JobConnector, JobSourceConfig, NormalizedJob e CollectionResult. Região é obrigatória no tipo; a validação de entrada aplica GLOBAL se ausente, conforme AC-03. Tipos de plataforma/região/modalidade independem do Prisma e do frontend.
 
-`fetchJobs` retorna jobs, rejeições (índice/ID seguro/código), avisos, contagens recebidas/aceitas/rejeitadas e tentativas HTTP. Em falha integral lança IntegrationError: nunca converte erro em lista vazia. Uma lista vazia válida retorna contagens zero; itens inválidos afetam somente suas próprias posições. O futuro serviço de sincronização converterá esses resultados em logs/SyncRun e persistência.
+`fetchJobs` retorna jobs, rejeições (índice/ID seguro/código), avisos, contagens recebidas/aceitas/rejeitadas e tentativas HTTP. Em falha integral lança IntegrationError: nunca converte erro em lista vazia. Uma lista vazia válida retorna contagens zero; itens inválidos afetam somente suas próprias posições. SyncService converte esses resultados em logs/SyncRun e persistência, validando o contrato normalizado sem reinterpretar o payload externo.
 
 ```text
 JobSourceConfig validada
@@ -53,7 +53,7 @@ Se Retry-After exceder 30 segundos, a chamada termina com `retryAfterExceeded=tr
 
 Códigos: INVALID_SOURCE, RATE_LIMITED, UPSTREAM_SERVER_ERROR, BOARD_NOT_FOUND (404/410), BOARD_UNAVAILABLE (401/403), HTTP_ERROR, REDIRECT_NOT_ALLOWED, TIMEOUT, NETWORK_ERROR, INVALID_JSON, UNEXPECTED_RESPONSE e RESPONSE_TOO_LARGE. Rejeições individuais: INVALID_ITEM, INVALID_ID, EMPTY_TITLE e INVALID_JOB_URL.
 
-Greenhouse retorna uma listagem; não há paginação ou sincronização de várias fontes nesta entrega. Concorrência de duas fontes/limite de páginas e auditoria consolidada continuam para S1-03/S2-04 e adapters paginados.
+Greenhouse retorna uma listagem, sem paginação. SyncService limita o lote a duas fontes por processo (opção de uma), registra auditoria e serializa gravações por fonte. Adapters paginados e controles operacionais mais amplos permanecem para Sprint 2.
 
 ## Testes e demonstração
 
@@ -67,3 +67,7 @@ O primeiro comando é offline e não requer banco. Fixtures sintéticas versiona
 O segundo faz consulta pública real e imprime somente diagnóstico/contagens. Não carrega `.env`, importa Prisma ou escreve no banco. Board inválido/falha retorna exit code diferente de zero. Não executar esse comando no CI como substituto de fixtures.
 
 **Evidência real:** `pnpm greenhouse:check figma`, 11/10/2026 às 07:15:41 UTC: 150 recebidos, 150 aceitos, zero rejeitados/avisos, uma tentativa, 608 ms. Datas de publicação e modalidades não foram inventadas (zero conhecidas). Esses anúncios não foram filtrados como estágios nem gravados. Disponibilidade futura da fonte não é garantida.
+
+## Persistência e consumo na interface
+
+[SyncService](synchronization.md) reutiliza JobConnector/CollectionResult, sem duplicar transporte ou mapeamento. CLI seleciona fontes habilitadas; JobsModule e Next.js leem apenas o resultado persistido. Novos adapters implementarão o contrato e serão registrados no serviço; a API pública e a interface não precisam conhecer payloads externos.
