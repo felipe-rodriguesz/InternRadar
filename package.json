@@ -21,7 +21,11 @@
     "db:test:up": "docker compose --profile test up --detach --wait --wait-timeout 90 postgres-test",
     "db:test:stop": "docker compose --profile test stop postgres-test",
     "db:test:logs": "docker compose --profile test logs --tail 100 postgres-test",
-    "db:verify": "node scripts/verify-database.mjs"
+    "db:verify": "node scripts/verify-database.mjs",
+    "dev": "pnpm --parallel --filter @internradar/api --filter @internradar/web dev",
+    "typecheck": "pnpm --recursive typecheck",
+    "build": "pnpm --recursive build",
+    "test": "pnpm --recursive --workspace-concurrency=1 test"
   },
   "devDependencies": {
     "@eslint/compat": "2.1.1",
@@ -30,6 +34,7 @@
     "eslint-config-prettier": "10.1.8",
     "prettier": "3.9.9",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.71.1"
+    "typescript-eslint": "8.71.1",
+    "eslint-config-next": "16.4.0"
   }
 }

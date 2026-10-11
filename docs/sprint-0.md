@@ -398,3 +398,21 @@ A variante oficial Debian Trixie preserva PostgreSQL 17.11 e o caminho de dados,
 Revisão final da recuperação: `pnpm install --frozen-lockfile --strict-peer-dependencies`, `pnpm lint`, `pnpm format:check`, `pnpm workspace:list`, `pnpm list --depth 0`, `node --check scripts/verify-database.mjs` e `git diff main --check` aprovados. Os 35 arquivos versionáveis passaram na revisão de credenciais locais/padrões de segredo, YAML/JSON, links, ADRs e LF. O parser YAML considera os múltiplos documentos do lockfile pnpm. API TypeScript confirmou strict nos três tsconfigs; `.env` segue ignorado, modo 0600. SHA-256 da especificação: `917610528b367257bc1fe2da1a02ac1527e30e6cd2f52052e45cd95e7414e65e`, com igualdade de bytes ao original.
 
 Inventário, digests, verificações de integridade e limites constam em [postgresql-recovery.md](postgresql-recovery.md). Issues #3/#4 permanecem abertas até integração autorizada do PR #5. Nenhum merge, tag, release ou limpeza de recursos faz parte desta recuperação.
+
+## S0-04/S0-05 — Aplicações e persistência
+
+PR #5 integrado por rebase em `2507b8ccfea3da388dea67e16a1e99677624d094`; Issues #3/#4 fechadas automaticamente. Branch `feat/s0-04-05-apps-prisma` derivada da main sincronizada. Issues [#6](https://github.com/felipe-rodriguesz/InternRadar/issues/6) e [#7](https://github.com/felipe-rodriguesz/InternRadar/issues/7). Branches anteriores preservadas.
+
+### Inicialização S0-04 — 11/10/2026
+
+Next.js 16.4.0, React 19.3.0, Tailwind 4.3.3 e NestJS 12.1.2 instalados nos respectivos workspaces. Node 24.21.0, pnpm 12.12.0 e TypeScript 6.0.3 mantidos. ESLint 9.39.5 mantido após conferir peers React/JSX accessibility; `eslint-config-next` 16.4.0 aplicado somente à web. O aviso de depreciação do ESLint permanece conhecido; major 10 depende da compatibilidade dos plugins. Scripts de instalação esbuild/unrs-resolver revisados e permitidos por versão no workspace.
+
+API CommonJS usa `module/moduleResolution: NodeNext` para modelar `require(esm)` do Node 24 com NestJS 12. `Node16` não modelava esse suporte; o ajuste foi comprovado com compilação e execução. `tsx` serve ao desenvolvimento; injeções futuras usarão tokens explícitos, sem depender da emissão de metadata pelo esbuild.
+
+- Lint, typecheck e builds reais Next.js/NestJS aprovados.
+- Três testes de API aprovados: ambiente válido, rejeições de ambiente e HTTP real (health, alias, CORS e 404 sanitizado).
+- Seis testes Playwright aprovados em Chromium/Firefox: integração real, loading, falha de rede/recuperação e viewport 375 px/teclado. Screenshot móvel inspecionado.
+- Nesta etapa, saúde declara banco `not_checked`; a conexão real será introduzida na S0-05. `/health` redireciona com 307 para `/api/v1/health`.
+- `next dev` gera `apps/web/AGENTS.md`; mantido no repositório. Declarações `next-env.d.ts` são geradas e ignoradas.
+
+S0-05 segue em implementação; resultados posteriores serão registrados separadamente.

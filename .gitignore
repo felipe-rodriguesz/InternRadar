@@ -42,3 +42,10 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Resultados locais dos testes de navegador.
+/apps/web/test-results/
+/apps/web/playwright-report/
+
+# Declarações geradas por next typegen/dev/build.
+/apps/web/next-env.d.ts
