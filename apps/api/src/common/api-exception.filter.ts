@@ -1,5 +1,6 @@
 import { Catch, HttpException, HttpStatus } from '@nestjs/common';
 import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
+import { InvalidQueryError } from '../jobs/jobs-query';
 
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
@@ -28,10 +29,18 @@ export class ApiExceptionFilter implements ExceptionFilter {
       .getResponse<{ status: (code: number) => { json: (body: unknown) => void } }>();
     response.status(status).json({
       statusCode: status,
-      code: databaseUnavailable ? 'DATABASE_UNAVAILABLE' : (codes[status] ?? 'INTERNAL_ERROR'),
-      message: databaseUnavailable
-        ? 'Banco de dados temporariamente indisponível.'
-        : (messages[status] ?? 'Não foi possível concluir a operação.'),
+      code:
+        error instanceof InvalidQueryError
+          ? 'INVALID_QUERY'
+          : databaseUnavailable
+            ? 'DATABASE_UNAVAILABLE'
+            : (codes[status] ?? 'INTERNAL_ERROR'),
+      message:
+        error instanceof InvalidQueryError
+          ? error.safeMessage
+          : databaseUnavailable
+            ? 'Banco de dados temporariamente indisponível.'
+            : (messages[status] ?? 'Não foi possível concluir a operação.'),
     });
   }
 }
