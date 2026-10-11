@@ -22,7 +22,7 @@ Regressão local: `pnpm test` aprovou os 35 unitários, 2 HTTP e 8 testes Playwr
 
 Revisão de 98 arquivos candidatos: especificação idêntica ao original por bytes/SHA-256, Compose/digest/schema/strict base preservados, nenhuma credencial local ou padrão de chave/token encontrado. JSON/YAML/LF, configuração de CI, workspaces e whitespace aprovados.
 
-A configuração de CI está implementada; homologação remota ainda depende da publicação e execução do workflow. Resultados finais de regressão e CI serão acrescentados após execução, sem tratar configuração como teste aprovado.
+CI homologada no [run 38121178306](https://github.com/felipe-rodriguesz/InternRadar/actions/runs/38121178306), HEAD `4137084`, com todos os passos aprovados: instalação limpa, qualidade/builds, migração/seed e 53 testes (35 unitários, 2 HTTP, 8 persistência, 8 browsers). O [PR #12](https://github.com/felipe-rodriguesz/InternRadar/pull/12) mantém os Checks do último commit; merge depende de autorização. Issues #9/#10/#11 atualizadas, sem criar Issues das entregas seguintes.
 
 ## Pendências deliberadas
 

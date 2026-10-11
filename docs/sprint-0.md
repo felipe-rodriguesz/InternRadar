@@ -10,7 +10,7 @@
 - S0-01 integrada por rebase no [PR #2](https://github.com/felipe-rodriguesz/InternRadar/pull/2), em `acaff60f8bb4aacc703fad89886b033807b0588c`; Issue #1 fechada.
 - Lote autorizado S0-02/S0-03: branch `chore/s0-02-03-docs-postgresql`, derivada dessa main após `git pull --ff-only`. Issues [#3](https://github.com/felipe-rodriguesz/InternRadar/issues/3) e [#4](https://github.com/felipe-rodriguesz/InternRadar/issues/4), no mesmo Milestone.
 - S0-02/S0-03 integradas por rebase no [PR #5](https://github.com/felipe-rodriguesz/InternRadar/pull/5), em `2507b8ccfea3da388dea67e16a1e99677624d094`, após autorização e conferência do HEAD `ba3e6c5b7f05a865a0ebee0981f7616200360a0b`. Três commits preservados; Issues #3/#4 fechadas automaticamente. Os registros das falhas anteriores abaixo são históricos.
-- Lote S0-04/S0-05: branch `feat/s0-04-05-apps-prisma`, Issues #6/#7. Aplicações e persistência implementadas; resultados e pendência de verificação Ashby registrados ao final. S0-06 ainda não iniciada.
+- Lote S0-04/S0-05: branch `feat/s0-04-05-apps-prisma`, Issues #6/#7. Aplicações e persistência implementadas; resultados e pendência de verificação Ashby registrados ao final. S0-06 implementada e homologada no lote com S1-01/S1-02, conforme registro ao final.
 
 ## Distribuição das validações aprovada
 
@@ -258,7 +258,7 @@ Referências: [typescript-eslint: versões suportadas](https://typescript-eslint
 
 ## Pendências rastreáveis
 
-Pendências originalmente abertas na S0-01. As linhas S0-04-Q01/Q02/V01/V02/V03 e S0-05-V01/V02/V03/V04 foram **validadas em 11/10/2026**, com evidências no registro S0-04/S0-05 ao final. S0-06-V01 permanece pendente da execução em CI; a instalação limpa local já foi verificada.
+Pendências originalmente abertas na S0-01. As linhas S0-04-Q01/Q02/V01/V02/V03 e S0-05-V01/V02/V03/V04 foram **validadas em 11/10/2026**, com evidências no registro S0-04/S0-05 ao final. S0-06-V01 foi homologada no GitHub Actions em 11/10/2026, conforme registro ao final.
 
 | ID        | Etapa responsável | Validação/entrega esperada                                                                                                                                                     |
 | --------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -448,7 +448,7 @@ Ambos os containers diários permaneceram healthy. Cerca de 15 GiB livres no C: 
 - [x] Testes de persistência isolados, enabled=false preservado e recursos antigos mantidos.
 - [x] Especificação v1.0 preservada; decisões novas em ADR-008 e alterações complementares.
 - [ ] S0-05-P01: verificar um board Ashby antes de S2-01. Endpoints consultados retornaram 403; nenhum identificador Ashby foi incluído no seed sem evidência.
-- [ ] S0-06-V01: provisionar banco/browsers no GitHub Actions e executar os comandos reais; configuração de ambiente em runner limpo e critérios TA-01/TA-12 em CI.
+- [x] S0-06-V01: banco/browsers provisionados e comandos reais aprovados no runner limpo; TA-01/TA-12 no escopo da fundação homologados no lote seguinte.
 - [ ] S0-06-P01: acompanhar suporte dos plugins à major seguinte do ESLint; major 9 permanece compatível e fixada.
 
 Builds/integração não representam implementação de conectores, sincronização, listagem de vagas ou outras funcionalidades futuras. S0-06 não foi implementada neste lote.
@@ -475,4 +475,6 @@ PR #8 integrado por rebase em 11/10/2026, main `200298c8b0409eb019579665f06f8f4d
 
 Pipeline implementada em `.github/workflows/ci.yml`, com versões do projeto, actions por SHA, token contents:read, dois clusters efêmeros PostgreSQL, geração/migração/seed, lint/format/strict/build, testes unitários/HTTP/persistência e Playwright Chromium/Firefox. Serviços pertencem exclusivamente ao runner; Compose/digest local permanecem intactos. [Operação e segurança](ci.md).
 
-S0-06-V01/TA-01/TA-12 remotos aguardam a execução efetiva do workflow após publicação do PR. Nenhuma homologação remota é inferida somente da presença do YAML. A pendência Ashby e o acompanhamento da major do ESLint permanecem registrados.
+S0-06-V01/TA-01/TA-12 aprovados no runner limpo: [execução 38121178306](https://github.com/felipe-rodriguesz/InternRadar/actions/runs/38121178306), evento pull_request, HEAD `4137084cfab859c17f2d1e1ef9972e6d94967293`, conclusion=success. Instalação congelada, geração Prisma, lint, format, strict, builds, migração/seed, 35 unitários, 2 HTTP, 8 persistência e 8 Playwright aprovados. Integridade/workspaces e finalização dos containers também concluídas.
+
+[PR #12](https://github.com/felipe-rodriguesz/InternRadar/pull/12) reúne o lote; o estado do último commit deve ser conferido nos Checks. Issues #9/#10/#11 permanecem abertas até merge autorizado. Nenhuma proteção de branch, tag ou release criada. Sprint 0 possui todas as entregas implementadas; a integração de S0-06 à main ainda depende da revisão deste PR. A pendência Ashby e o acompanhamento da major do ESLint permanecem registrados.
