@@ -1,0 +1,44 @@
+# Dependências e store local do pnpm.
+node_modules/
+.pnpm-store/
+
+# Configurações locais e segredos, em qualquer pacote.
+.env
+.env.*
+!.env.example
+
+# Builds e cobertura: limitar às saídas da raiz e dos aplicativos.
+/dist/
+/build/
+/out/
+/coverage/
+/apps/*/dist/
+/apps/*/build/
+/apps/*/out/
+/apps/*/coverage/
+/apps/web/.next/
+*.tsbuildinfo
+
+# Cliente Prisma gerado; schema, seed e migrações continuam visíveis.
+/apps/api/src/generated/prisma/
+
+# Caches e arquivos temporários de ferramentas.
+/.cache/
+/apps/*/.cache/
+.eslintcache
+/tmp/
+/temp/
+/apps/*/tmp/
+/apps/*/temp/
+/logs/
+/apps/*/logs/
+npm-debug.log*
+pnpm-debug.log*
+
+# Arquivos temporários de editores e do sistema operacional.
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,9 @@
+# Detectar arquivos de texto e manter LF no repositório e no checkout.
+* text=auto eol=lf
+
+# Scripts específicos do Windows usam CRLF no checkout.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Preservar as quebras Markdown do original sem suprimir outros checks.
+docs/requirements.md whitespace=-blank-at-eol
