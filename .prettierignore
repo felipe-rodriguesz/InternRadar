@@ -1,0 +1,5 @@
+# Especificação oficial preservada byte a byte; revisões são separadas.
+/docs/requirements.md
+
+# Artefato gerado e mantido exclusivamente pelo pnpm.
+/pnpm-lock.yaml

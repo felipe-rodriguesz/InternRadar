@@ -1,0 +1,7 @@
+packages:
+  - 'apps/*'
+
+sharedWorkspaceLockfile: true
+engineStrict: true
+pmOnFail: error
+savePrefix: ''

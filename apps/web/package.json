@@ -1,0 +1,6 @@
+{
+  "name": "@internradar/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Frontend do InternRadar; inicialização na S0-04"
+}
